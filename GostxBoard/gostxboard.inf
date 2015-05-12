@@ -1,0 +1,176 @@
+:/**********************************************************************//
+;/ 					This file is part of GostxBoard						//
+;/																		//
+;/  GostxBoard is free software: you can redistribute it and/or modify	//
+;/  it under the terms of the GNU General Public License as published	// 
+;/	by the Free Software Foundation, either version 3 of the License, 	//
+;/	or (at your option) any later version. 								//
+;/                Such things are STRONGLY recommended.					//
+;/    																	//
+;/ 	GostxBoard is distributed in the hope that it will be useful,		//
+;/  but WITHOUT ANY WARRANTY; without even the implied warranty of		//	
+;/  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the		//
+;/  GNU General Public License for more details.						//	
+;/  Do not blame the developper if something goes wrong. You can 		//	
+;/  either search on the Internet or email the developper to deal 		//
+;/  with it.															//
+;/																		//
+;/  You should have received a copy of the GNU General Public License 	//
+;/  along with GostxBoard.  If not, see <http://www.gnu.org/licenses/>. //
+;/																		//
+;/                                P.A 									//
+;/                    driver_support@whitekernel.fr 					//
+;/**********************************************************************//
+
+;
+; \~English
+; \file      gostxboard.inf
+; \author    P.A
+; \version   1.0
+; \date      May 21, 2015
+; \brief     Information driver for install
+;
+; \~French
+; \file		gostxaboard.inf
+; \author	P.A
+; \version  1.0
+; \date		21 Mai 2015
+; \brief	Informations du driver pour l'installation
+;
+;
+
+;================================
+;             INFO
+;================================
+[Version]
+Signature="$WINDOWS NT$"
+Class=Keyboard
+ClassGuid={4D36E96B-E325-11CE-BFC1-08002BE10318}				; Driver filter GUID
+Provider=%WhiteKernel%
+DriverVer=; 													; Propriété StampInfo
+CatalogFile=GostxBoard.cat
+
+[Manufacturer]
+%ManufacturerName%=Standard,NT$ARCH$
+
+[Standard.NT$ARCH$]
+%WhiteKernel% = gostxboard, *PNP0303
+
+
+;================================
+;      GENERALE INSTALLATION
+;================================
+[DestinationDirs]
+DefaultDestDir = 12
+gostxboard_CoInstaller_CopyFiles = 11
+
+[SourceDisksNames]
+1 = %DiskName%,,,""
+
+[SourceDisksFiles.x86]
+gostxboard_x86.sys = 1,,
+WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll=1
+[SourceDisksFiles.amd64]
+gostxboard_x64.sys = 1,,
+WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll=1
+
+[gostxboard.NTx86]
+Include=Keyboard.inf
+Needs=STANDARD_Inst
+CopyFiles=gostxboard.CopyFiles.NTx86
+[gostxboard.NTAMD64]
+Include=Keyboard.inf
+Needs=STANDARD_Inst
+CopyFiles=gostxboard.CopyFiles.NTAMD64
+
+[gostxboard.CopyFiles.NTx86]
+gostxboard_x86.sys
+[gostxboard.CopyFiles.NTAMD64]
+gostxboard_x64.sys
+
+
+;================================
+;      SERVICE INSTALLATION
+;================================
+
+[gostxboard.NTx86.Services]
+AddService = gostxboard, , gostxboard_Service_Inst_x86
+Include=keyboard.inf
+Needs=STANDARD_Inst.Services
+
+[gostxboard_Service_Inst_x86]
+DisplayName	= %gostxboard.SvcDesc%
+ServiceType    = 1                  ; SERVICE_KERNEL_DRIVER
+StartType      = 3                  ; SERVICE_DEMAND_START
+ErrorControl   = 1                  ; SERVICE_ERROR
+LoadOrderGroup = Keyboard Port
+ServiceBinary  = %12%\gostxboard_x86.sys
+
+
+[gostxboard.NTamd64.Services]
+AddService = gostxboard, , gostxboard_Service_Inst_amd64
+Include=keyboard.inf
+Needs=STANDARD_Inst.Services
+
+[gostxboard_Service_Inst_amd64]
+DisplayName	= %gostxboard.SvcDesc%
+ServiceType    = 1                  ; SERVICE_KERNEL_DRIVER
+StartType      = 3                  ; SERVICE_DEMAND_START
+ErrorControl   = 1                  ; SERVICE_ERROR
+LoadOrderGroup = Keyboard Port
+ServiceBinary  = %12%\gostxboard_amd64.sys
+
+[gostxboard.NT.HW]
+AddReg = gostxboard.HW.AddReg
+Include=keyboard.inf
+Needs=STANDARD_Inst.HW
+
+[gostxboard.HW.AddReg]
+HKR,,"UpperFilters",0x00010000,"gostxboard"
+
+
+;================================
+;    COINSTALLER INSTALLATION
+;================================
+
+[gostxboard.NTx86.CoInstallers]
+AddReg=gostxboard_CoInstaller_AddReg_x86
+CopyFiles=gostxboard_CoInstaller_CopyFiles
+[gostxboard.NTamd64.CoInstallers]
+AddReg=gostxboard_CoInstaller_AddReg_x64
+CopyFiles=gostxboard_CoInstaller_CopyFiles
+
+
+[gostxboard_CoInstaller_AddReg_x86]
+HKR,,CoInstallers32,0x00010000, "WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll,WdfCoInstaller"
+[gostxboard_CoInstaller_AddReg_x64]
+HKR,,CoInstallers64,0x00010000, "WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll,WdfCoInstaller"
+
+[gostxboard_CoInstaller_CopyFiles]
+WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll
+
+[gostxboard.NT.Wdf]
+KmdfService= gostxboard, gostxboard_wdf
+
+[gostxboard_wdf]
+KmdfLibraryVersion=$KMDFVERSION$
+
+
+;================================
+;           STRINGS
+;================================
+[Strings]
+ManufacturerName="WhiteKernel"
+WhiteKernel="GostxBoard"
+DiskName="GostxBoard Source Disk"
+gostxboard.SvcDesc="GostxBoard Protection"
+
+REG_SZ         = 0x00000000
+REG_MULTI_SZ   = 0x00010000
+REG_EXPAND_SZ  = 0x00020000
+REG_BINARY     = 0x00000001
+REG_DWORD      = 0x00010001
+SERVICEROOT    = "System\CurrentControlSet\Services"
+
+
+

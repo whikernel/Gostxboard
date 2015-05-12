@@ -1,0 +1,117 @@
+;
+; GostxBoard.inf
+;
+
+[Version]
+Signature="$WINDOWS NT$"
+Class=Keyboard
+ClassGuid={4D36E96B-E325-11CE-BFC1-08002BE10318}				; Driver filter GUID
+Provider=%WhiteKernel%
+CatalogFile=GostxBoard.cat
+DriverVer= ; TODO: set DriverVer in stampinf property pages
+
+[DestinationDirs]
+DefaultDestDir = 11
+
+;*****************************************
+; Install Section
+;*****************************************
+
+[Manufacturer]
+%WhiteKernel% = WhiteKernel.Mfg,NT$ARCH$
+
+;[Standard.NT$ARCH$]
+;%GostxBoard.DeviceDesc%=gostxboard, Root\gostxboard ; TODO: edit hw-id
+; Pour XP et les versions sup
+
+[WhiteKernel.Mfg.NT$ARCH$]
+%WhiteKernel% = gostxboard, *PNP0303
+
+;------------- General installation --------------
+
+[gostxboard.NT]
+Include=keyboard.inf
+Needs=STANDARD_Inst
+
+CopyFiles=gostxboard.CopyFiles
+
+
+
+;-------------- Service installation---------------
+[gostxboard.NT.Services]
+AddService = gostxboard, gostxboard_Service_Inst
+Include=keyboard.inf
+Needs=STANDARD_Inst.Services
+
+
+
+; -------------- GostxBoard driver install sections
+[gostxboard_Service_Inst]
+DisplayName    = %GostxBoard.SVCDESC%
+ServiceType    = 1               ; SERVICE_KERNEL_DRIVER
+StartType      = 3               ; SERVICE_DEMAND_START
+ErrorControl   = 1               ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\GostxBoard_$ARCH$.sys
+LoadOrderGroup = Keyboard Port 
+
+[gostxboard.NT.HW]
+AddReg = gostxboard.HW.AddReg
+
+Include=keyboard.inf
+Needs=STANDARD_Inst.HW
+
+[gostxboard.HW.AddReg]
+HKR,,"UpperFilters",0x0,"GostxBoard"
+
+
+;
+;--- GostxBoard_Device Coinstaller installation ------
+;
+
+[DestinationDirs]
+gostxboard_CoInstaller_CopyFiles = 11			; Copie standard dans %windir\System32 
+
+[GostxBoard_Device.NT.CoInstallers]
+AddReg=gostxboard_CoInstaller_AddReg
+CopyFiles=gostxboard_CoInstaller_CopyFiles
+
+[gostxboard_CoInstaller_AddReg]
+HKR,,CoInstallers32,0x00010000, "WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll,WdfCoInstaller"
+
+[gostxboard_CoInstaller_CopyFiles]
+WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll
+
+[SourceDisksFiles]
+WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll=1 ; make sure the number matches with SourceDisksNames
+
+[gostxboard.CopyFiles]
+GostxBoard_x64.sys
+
+[GostxBoard.NT.Wdf]
+KmdfService =  gostxboard, gostxboard_wdfsect
+[GostxBoard_wdfsect]
+KmdfLibraryVersion = $KMDFVERSION$
+
+[Strings]
+
+;
+; Non localizable
+;
+REG_SZ         = 0x00000000
+REG_MULTI_SZ   = 0x00010000
+REG_EXPAND_SZ  = 0x00020000
+REG_BINARY     = 0x00000001
+REG_DWORD      = 0x00010001
+SERVICEROOT    = "System\CurrentControlSet\Services"
+
+;SPSVCINST_ASSOCSERVICE= 0x00000002
+;ManufacturerName="" ; TODO: add ManufacturerName
+;ClassName="Samples" ; TODO: edit ClassName
+DiskName = "GostxBoard Installation Disk"
+;GostxBoard.DeviceDesc = "GostxBoard Device"
+GostxBoard.SVCDESC = "GostxBoard Service"
+WhiteKernel = "GostxBoard by WhiteKernel"
+
+;DiskId1 = "DDK Example Installation Disk #1 (Keyboard)"
+;DDK_Ex = "DDK Example Device that needs filtering"
+;kbfiltr.SvcDesc="Keyboard Filter Example"

@@ -1,0 +1,3 @@
+map
+\SystemRoot\System32\AvfiDriver.sys
+C:\Users\Blended\Documents\CVO\AvfiDriver\x64\Win7Release\AvfiDriver.sys

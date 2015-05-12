@@ -1,0 +1,85 @@
+/****************************************************/
+//   Fiche d'évolution du driver AvfiKeyboadHook	//
+// 				     Version 2.0					//
+//					24 / 07 / 2014					//	
+// 		   Licence Paul Amicelli Pour GostCrypt		//
+//				amicelli@whitekernel.fr				//
+/****************************************************/
+/***************************************************/
+/*												   */
+/*				  Notes de versions				   */
+/*												   */
+/***************************************************/
+
+#------------#
+# Version 1.0     
+#------------#
+	- Implémentation d'un filtre de clavier permettant
+		d'afficher les caractères entrées sur le clavier.
+		Seul le clavier interne PS/2 est visé pour le 
+		moment. 
+		Le driver se situe sur les couches supérieurs
+		de la stack keyboard.
+		Le driver permet de récupérer les codes claviers
+		générés lors de la frappe d'une touche. L'insert
+		-ion des données dans un fichier n'est pas compl
+		-etement aboutie dû au fait que seuls les scans 
+		code sont accessibles à ce niveau. 
+
+#------------#
+# Version 1.1     
+#------------#
+	- Implémentation d'un pont de communication entre le
+		driver et une application Win32. L'application 
+		Win32 siganl au driver qu'elle veut démarrer une
+		communication sécurisé grâce à un IOCTL contenant
+		une clé de chiffrement publique. Le driver envoie 
+		alors tous les scan-codes de manière chiffrés à 
+		l'application. 
+	- Le chiffrement des clés suivant la clé définie dans
+		l'IOCTL de départ est effectif. La vitesse de trait-
+		ement en mode non debug est tout à fait viable. 
+		De nombreux beugs sont cependant à déplorer. 
+		Certaines touches ne semblent pas 
+		réagir dû au fait qu'elles correspondent à des
+		fonctions du clavier. Elles sont donc interceptéess
+		avant l'arrivée à l'application. Limiter le chiffr-
+		-ement de la clé à certaines bornes devrait résoudre
+		ce prolème.
+	- Implémentation d'une black-liste pour limiter le chiff-
+		rement. 
+	- Implémentation d'une sauvegarde de l'Eprocess de 
+		l'appli demandant un accès au chiffrement. Durant ce 
+		chiffrement, aucune autre application ne peut 
+		demander l'accès. Les touches sont néamoins diffusés 
+		en broadcast.
+	- Implémentation d'un chiffrement à flots grâce à une liste
+		blanche. 
+	- Le système de liste noire est, pour le moment, abandonné
+		pour un système de liste blanche. A chaque récéption 
+		d'une IRP provenant du clavier, le driver vérifie si 
+		la touche est contenu dans la liste blanche et donc
+		s'il doit la chiffrer ou non. 
+	- La gestion du crash d'une application est gérée grâce à 
+		la vérification du PEprocess de l'application demandant
+		le chiffrement. 
+	- La gestion en cas de changement d'application est gérée. Si
+		une autre application que celle demandant le chiffrement
+		passe au premier plan, alors le chiffrement est immédiate
+		ment intérrompu. Cela entraine le renouvellement des clés
+		de chiffrement. L'application doit immédiatement renouvel
+		-ler sa demande de chiffrement auprès du driver. 
+	- L'application doit désormais faire une requête auprès du dr
+		-iver pour pouvoir demander un chiffrement. Si cela est 
+		possible (i.e qu'il n'y a pas une application qui chiffre)
+		alors le driver répond avec une clé unique. Cette clé est
+		amenée à être changée tous les 50 caractères environ. 
+
+#------------#
+# Version 2.0     
+#------------#
+	- Le driver doit être descendu pour des raisons de sécurités. 
+		En effet l'API de Windows permet de Hooker les entrées clavier 
+		à un niveau inférieur du driver <GostxBoard V2>
+
+

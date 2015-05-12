@@ -1,0 +1,10 @@
+LIBRARY GostxBoard 
+EXPORTS GostxBoardBeginCipherSession			@1
+		GostxBoardInitiateSession				@2
+		GostxBoardCloseCipherSession			@3
+		GostxBoardGetCodeMessage				@4
+		GostxBoardRunSelfEncryptionTest			@5
+		GostxBoardDecipherChar					@6
+		GostxBoardGetLastReturnCode				@7
+		GostxBoardStartMonitorProcessusState	@8
+		
