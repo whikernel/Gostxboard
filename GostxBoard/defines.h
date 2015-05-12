@@ -18,21 +18,21 @@
 //  You should have received a copy of the GNU General Public License 	//
 //  along with GostxBoard.  If not, see <http://www.gnu.org/licenses/>. //
 //																		//
-//                                P.A 									//
+//                              P.A 									//
 //                    driver_support@whitekernel.fr 					//
 //**********************************************************************//
 
 /**
 * \~English
 * \file      defines.h
-* \author    P.A
+* \author    Paul Amicelli
 * \version   1.0
 * \date      May 21, 2015
 * \brief     Define some defines needed by the driver 
 *
 * \~French
 * \file		defines.h
-* \author	P.A
+* \author	Paul Amicelli
 * \version  1.0
 * \date		21 Mai 2015
 * \brief	Définit quelques defines nécessaires au fonctionnement du driver

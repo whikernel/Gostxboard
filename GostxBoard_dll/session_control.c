@@ -26,7 +26,7 @@
 /**
 * \~English
 * \file      session_control.c
-* \author    P.A
+* \author	 Paul Amicelli
 * \version   1.0
 * \date      May 21, 2015
 * \brief	 API communication with the driver
@@ -35,7 +35,7 @@
 *
 * \~French
 * \file		session_control.c
-* \author	P.A
+* \author	 Paul Amicelli
 * \version  1.0
 * \date		21 Mai 2015
 * \brief	Communication API- Driver

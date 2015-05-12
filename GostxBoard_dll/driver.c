@@ -26,7 +26,7 @@
 /**
 * \~English
 * \file      driver.c
-* \author    P.A
+* \author	 Paul Amicelli
 * \version   1.0
 * \date      May 21, 2015
 * \brief	 Some functions used by the API to handle driver's connection
@@ -34,7 +34,7 @@
 *
 * \~French
 * \file		driver.c
-* \author	P.A
+* \author	 Paul Amicelli
 * \version  1.0
 * \date		21 Mai 2015
 * \brief	Définit quelques fonctions utilisées par l'API pour gérer la connexion avce le driver

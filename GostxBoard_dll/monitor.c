@@ -26,7 +26,7 @@
 /**
 * \~English
 * \file      monitor.c
-* \author    P.A
+* \author	 Paul Amicelli
 * \version   1.0
 * \date      May 21, 2015
 * \brief	 API monitoring of a process
@@ -38,7 +38,7 @@
 *
 * \~French
 * \file		monitor.c
-* \author	P.A
+* \author	 Paul Amicelli
 * \version  1.0
 * \date		21 Mai 2015
 * \brief	Suivie du processus par l'API

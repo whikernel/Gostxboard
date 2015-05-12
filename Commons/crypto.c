@@ -16,9 +16,9 @@
 //  with it.															//
 //																		//
 //  You should have received a copy of the GNU General Public License 	//
-//  along with GostxBoard.  If not, see <http://www.gnu.org/licenses/>.	//
+//  along with GostxBoard.  If not, see <http://www.gnu.org/licenses/>. //
 //																		//
-//                                Paul Amicelli 									//
+//                              P.A 									//
 //                    driver_support@whitekernel.fr 					//
 //**********************************************************************//
 

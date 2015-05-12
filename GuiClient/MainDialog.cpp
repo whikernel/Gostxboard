@@ -1,3 +1,54 @@
+//**********************************************************************//
+// 					This file is part of GostxBoard						//
+//																		//
+//  GostxBoard is free software: you can redistribute it and/or modify	//
+//  it under the terms of the GNU General Public License as published	// 
+//	by the Free Software Foundation, either version 3 of the License, 	//
+//	or (at your option) any later version. 								//
+//                Such things are STRONGLY recommended.					//
+//    																	//
+// 	GostxBoard is distributed in the hope that it will be useful,		//
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of		//	
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the		//
+//  GNU General Public License for more details.						//	
+//  Do not blame the developper if something goes wrong. You can 		//	
+//  either search on the Internet or email the developper to deal 		//
+//  with it.															//
+//																		//
+//  You should have received a copy of the GNU General Public License 	//
+//  along with GostxBoard.  If not, see <http://www.gnu.org/licenses/>. //
+//																		//
+//                                P.A 									//
+//                    driver_support@whitekernel.fr 					//
+//**********************************************************************//
+
+/**
+* \~English
+* \file      MainDialog.cpp
+* \author	 Paul Amicelli
+* \version   1.0
+* \date      May 21, 2015
+* \brief     Defines almost all functions of the graphical interface
+*
+* \details  Defines almost all functions used to display and handle the graphical interface. \n 
+*			It is done in order to show how the API can be used by any application. \n 
+*			It is surely not a perfect app and does not represent the work which has been 
+*			done for the security module. 
+*
+* \~French
+* \file		MainDialog.cpp
+* \author	Paul Amicelli
+* \version  1.0
+* \date		21 Mai 2015
+* \brief	Définit la plupart des fonctions de l'interface graphique
+*
+* \details	Définit les plupart des fonctions utilisés pour générer et gérer l'interface graphique. \n 
+*			Elle a été créée pour montrer comment l'API peut-être utilisée par n'importe quelle application. \n 
+*			Ce n'est certainement pas une application parfaite et elle ne représente pas le travail accomplie pour le module 
+*			de sécurité. 
+*/
+
+
 #include "stdafx.h"
 #include <CommCtrl.h>
 #include <conio.h>

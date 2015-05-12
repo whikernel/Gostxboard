@@ -25,7 +25,7 @@
 /**
 * \~English
 * \file      dispatch.c
-* \author    P.A
+* \author	 Paul Amicelli
 * \version   1.0
 * \date      May 21, 2015
 * \brief     [Depreciated] Defines dispatch functions
@@ -37,7 +37,7 @@
 *
 * \~French
 * \file		dispatch.c
-* \author	P.A
+* \author	 Paul Amicelli
 * \version  1.0
 * \date		21 Mai 2015
 * \brief	[Déprécié] Définit les fonctions de dispatch.

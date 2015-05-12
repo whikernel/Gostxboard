@@ -25,7 +25,7 @@
 /**
 * \~English
 * \file      main.c
-* \author    P.A
+* \author	 Paul Amicelli
 * \version   1.0
 * \date      May 21, 2015
 * \brief     Define the entry point of the DLL 
@@ -35,7 +35,7 @@
 *
 * \~French
 * \file		main.c
-* \author	P.A
+* \author	 Paul Amicelli
 * \version  1.0
 * \date		21 Mai 2015
 * \brief	Définit le point d'entrée de la DLL

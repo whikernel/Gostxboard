@@ -26,7 +26,7 @@
 /**
 * \~English
 * \file      tools.c
-* \author    P.A
+* \author	 Paul Amicelli
 * \version   1.0
 * \date      May 21, 2015
 * \brief	 API tools
@@ -37,7 +37,7 @@
 *
 * \~French
 * \file		tools.c
-* \author	P.A
+* \author	 Paul Amicelli
 * \version  1.0
 * \date		21 Mai 2015
 * \brief	Fonctions utilitaires de l'API

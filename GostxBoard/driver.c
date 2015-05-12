@@ -18,7 +18,7 @@
 //  You should have received a copy of the GNU General Public License 	//
 //  along with GostxBoard.  If not, see <http://www.gnu.org/licenses/>. //
 //																		//
-//                                P.A 									//
+//                              P.A 									//
 //                    driver_support@whitekernel.fr 					//
 //**********************************************************************//
 
@@ -136,7 +136,7 @@
 /**
 * \~English
 * \file      driver.c
-* \author    P.A
+* \author    Paul Amicelli
 * \version   1.0
 * \date      May 21, 2015
 * \brief     Defines standards driver functions
@@ -146,7 +146,7 @@
 *
 * \~French
 * \file		driver.c
-* \author	P.A
+* \author	Paul Amicelli
 * \version  1.0
 * \date		21 Mai 2015
 * \brief	Définit les fonctions standards des drivers
@@ -838,7 +838,7 @@ NTSTATUS GostxBoard_CreateRawPdo(
 	pnpDeviceCap.Removable			= WdfTrue;
 	pnpDeviceCap.SurpriseRemovalOK	= WdfTrue;
 	pnpDeviceCap.NoDisplayInUI		= WdfTrue;
-	pnpDeviceCap.Address			= InstanceNo;
+	pnpDeviceCaPaul Amicelliddress			= InstanceNo;
 	pnpDeviceCap.UINumber			= InstanceNo;
 	WdfDeviceSetPnpCapabilities(wdfChild, &pnpDeviceCap);
 
