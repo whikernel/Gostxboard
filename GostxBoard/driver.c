@@ -518,6 +518,9 @@ NTSTATUS GostxBoard_EvtDeviceAdd (
 	pCurrentApp->pEprocess = NULL;
 	pCurrentApp->wdfCurrentDevice = wdfDevice;
 
+	CheckDriverSecurityContext();
+
+
 	//
 	// Initialization of the MasterKey. This key is a strong random 64bits key, 
 	// used to generate the app credentials during the living of the driver.
@@ -888,6 +891,8 @@ NTSTATUS GostxBoard_CreateRawPdo(
 	#ifdef _DEBUG
 		DbgPrint("[+] GostxBoard_CreateRawPdo:: Exit with successfull status \n");
 	#endif
+
+
 	return STATUS_SUCCESS;
 
 Error:

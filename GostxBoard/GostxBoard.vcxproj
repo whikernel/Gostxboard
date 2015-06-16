@@ -203,7 +203,7 @@ BuildDriver.cmd -clean -release -x64 "$(ProjectDir)"</NMakeCleanCommandLine>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Win8.1 Release|Win32'">
     <TargetExt>.sys</TargetExt>
-    <TargetName>GostxBoard_$(PlatformTarget)</TargetName>
+    <TargetName>gostprotect-$(PlatformTarget)</TargetName>
     <OutDir>..\Release\Driver\$(PlatformTarget)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Win8.1 Release|x64'">

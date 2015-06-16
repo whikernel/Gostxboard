@@ -180,6 +180,8 @@ DWORD	CheckDriverSecurityContext(void)
 	PDEVICE_OBJECT pNextDevice = NULL;
 	PDRIVER_OBJECT pCurrDriver = NULL;
 
+	PWCHAR 
+
 	DbgPrint("[+] CheckDriverSecurityContext:: Check has begun.. \n");
 
 	// 
@@ -195,6 +197,7 @@ DWORD	CheckDriverSecurityContext(void)
 
 	pNextDevice = pRootDevice;
 
+	DbgPrint("==START OF CHAIN==\n");
 	//
 	// Walk the keyboard stack to check if something's wrong.. 
 	//
@@ -204,11 +207,29 @@ DWORD	CheckDriverSecurityContext(void)
 		pCurrDriver = pRootDevice->DriverObject;
 
 		// Check name of the driver
-		pCurrDriver->DriverName.Buffer
+		DbgPrint("\tName : %wZ \n",pCurrDriver->DriverName);
 
 		pNextDevice = IoGetLowerDeviceObject(pRootDevice);
 		pRootDevice = pNextDevice;
 	}
+
+	DbgPrint("==END OF CHAIN==\n");
+
+	DbgPrint("==Analyzing stack==\n");
+	pRootDevice = IoGetAttachedDeviceReference(pCurrentApp->wdfCurrentDevice);
+	pNextDevice = pRootDevice;
+	while (pNextDevice != NULL)
+	{
+		// Get driver from device object 
+		pCurrDriver = pRootDevice->DriverObject;
+
+		// Check name of the driver
+		DbgPrint("\tName : %wZ \n", pCurrDriver->DriverName);
+
+		pNextDevice = IoGetLowerDeviceObject(pRootDevice);
+		pRootDevice = pNextDevice;
+	}
+	DbgPrint("==End of analyze==");
 
 	return dwReturn;
 }
