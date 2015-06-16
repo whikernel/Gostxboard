@@ -185,10 +185,11 @@ static		DWORD	dwCurrentState  =	0;
 typedef struct _APP_CREDENTIALS {
 	GUID				guidApp;			//GUID pour identifier (deprec)
 	unsigned long long 	cPublicKey;		    //Clé de chiffrement publique
-	unsigned long long    MasterKey;			//Master Key
+	unsigned long long    MasterKey;		//Master Key
 	PEPROCESS			pEprocess;			//PE du processus appelant
 	HANDLE				hProcessId;			//Id du processus appelant
 	char				cHashPubKey[33];	//Hash de la clé
+	WDFDEVICE			wdfCurrentDevice;	//Current DeviceObject
 	PVOID				Unused;				//Inutilisé
 } APP_CREDENTIALS, * PAPP_CREDENTIALS;
 

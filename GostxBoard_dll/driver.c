@@ -253,7 +253,6 @@ end:
 }
 
 
-//****
 /**
 *\~English
 *\brief		[API] Get driver device interface

@@ -331,7 +331,7 @@ void GostxBoard_EvtUnload (
 *			initializing structures needed for the cipher. 
 *
 * \param    WDFDRIVER		DriverObject	Driver's driver object
-* \return   PWDFDEVICE_INIT	DeviceInit		Pointer to an opaque 
+* \param  PWDFDEVICE_INIT	DeviceInit		Pointer to an opaque 
 *											framework structure used to initiate the driver object
 *
 * \~French
@@ -345,7 +345,7 @@ void GostxBoard_EvtUnload (
 *			structures nécessaires au chiffrement.
 *			
 * \param    WDFDRIVER		DriverObject	Pointeur vers l'objet driver du driver
-* \return   PWDFDEVICE_INIT	DeviceInit		Pointeur vers uune structure opaque du framework 
+* \param   PWDFDEVICE_INIT	DeviceInit		Pointeur vers uune structure opaque du framework 
 *											utilisé pour initialisé l'objet driver
 *
 */
@@ -516,6 +516,7 @@ NTSTATUS GostxBoard_EvtDeviceAdd (
 		sizeof( APP_CREDENTIALS ), 'hpiC');
 	RtlSecureZeroMemory( pCurrentApp , sizeof( APP_CREDENTIALS ) );
 	pCurrentApp->pEprocess = NULL;
+	pCurrentApp->wdfCurrentDevice = wdfDevice;
 
 	//
 	// Initialization of the MasterKey. This key is a strong random 64bits key, 
@@ -577,7 +578,7 @@ NTSTATUS GostxBoard_EvtDeviceAdd (
 *			the FDO of the driver, so that it can process them.
 *
 * \param    WDFDRIVER	DriverObject	Driver's driver object
-* \return   ULONG		InstanceNo		Instance of the keyboard created
+* \param   ULONG		InstanceNo		Instance of the keyboard created
 *
 * \~French
 * \brief    Créé un raw pdo
@@ -587,7 +588,7 @@ NTSTATUS GostxBoard_EvtDeviceAdd (
 *			le fdo du driver, pour que celui-ci puisse les traiter.
 *
 * \param    WDFDRIVER		DriverObject	Pointeur vers l'objet driver du driver
-* \return   ULONG			InstanceNo		Instance du clavier créé
+* \param   ULONG			InstanceNo		Instance du clavier créé
 *
 */
 NTSTATUS GostxBoard_CreateRawPdo(
@@ -838,7 +839,7 @@ NTSTATUS GostxBoard_CreateRawPdo(
 	pnpDeviceCap.Removable			= WdfTrue;
 	pnpDeviceCap.SurpriseRemovalOK	= WdfTrue;
 	pnpDeviceCap.NoDisplayInUI		= WdfTrue;
-	pnpDeviceCaPaul Amicelliddress			= InstanceNo;
+	pnpDeviceCap.Address			= InstanceNo;
 	pnpDeviceCap.UINumber			= InstanceNo;
 	WdfDeviceSetPnpCapabilities(wdfChild, &pnpDeviceCap);
 
@@ -891,7 +892,7 @@ NTSTATUS GostxBoard_CreateRawPdo(
 
 Error:
 	#ifdef _DEBUG
-		DbgPrint("\n[x] GostxBoard_GostxBoard_CreateRawPdo::A fatal error occurred while trying to create PDO. Check previsous error for further information.\n", ntStatus);
+		DbgPrint("\n[x] GostxBoard_GostxBoard_CreateRawPdo::A fatal error occurred while trying to create PDO. Check previous error for further information.\n", ntStatus);
 		DbgPrint("[x] GostxBoard_GostxBoard_CreateRawPdo:: Exit with UNSUCCESSFULL status - Previsous error code 0x%x\n", ntStatus);
 	#endif
 

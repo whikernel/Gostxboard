@@ -1,38 +1,36 @@
 //**********************************************************************//
-// 					This file is part of GostxBoard						//
+// 					This file is part of GostCrypt						//
 //																		//
-//  GostxBoard is free software: you can redistribute it and/or modify	//
-//  it under the terms of the GNU General Public License as published	// 
-//	by the Free Software Foundation, either version 3 of the License, 	//
-//	or (at your option) any later version. 								//
+//  GostxCrypt is free software: you can redistribute it and/or modify	//
+//  it under the terms of the TrueCrypt Collective License.				//
 //                Such things are STRONGLY recommended.					//
 //    																	//
-// 	GostxBoard is distributed in the hope that it will be useful,		//
+// 	 GostCrypt is distributed in the hope that it will be useful,		//
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of		//	
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the		//
 //  GNU General Public License for more details.						//	
-//  Do not blame the developper if something goes wrong. You can 		//	
-//  either search on the Internet or email the developper to deal 		//
+//  Do not blame the developpers if something goes wrong. You can 		//	
+//  either search on the Internet or email the developpers to deal 		//
 //  with it.															//
 //																		//
-//  You should have received a copy of the GNU General Public License 	//
-//  along with GostxBoard.  If not, see <http://www.gnu.org/licenses/>. //
+//  You should have received a copy of the TrueCrypt Public License 	//
+//    along with GostCrypt.  If not, see <http://gostcrypt.org/>.		//
 //																		//
 //                              P.A 									//
-//                    driver_support@whitekernel.fr 					//
+//						support@gostcrypt.org 							//
 //**********************************************************************//
 
 /**
 * \~English
 * \file      functions.h
-* \author    Paul Amicelli
+* \author    GostCrypt Foundation - P.A
 * \version   1.0
 * \date      May 21, 2015
 * \brief     Header of functions.c
 *
 * \~French
 * \file		functions.h
-* \author	Paul Amicelli
+* \author	GostCrypt Foundation - P.A
 * \version  1.0
 * \date		21 Mai 2015
 * \brief	Header de functions.c
@@ -45,7 +43,7 @@
 #include "driver.h"
 #include "../Commons/defineKbFr.h"
 
-VOID HashKey( char * cKey, int keyLength, unsigned char usResult[32] );
+//VOID HashKey( char * cKey, int keyLength, unsigned char usResult[32] );
 VOID ProcessNotifyRoutine ( HANDLE parentId, HANDLE processId,BOOLEAN create );
 
 #endif

@@ -1,31 +1,29 @@
 //**********************************************************************//
-// 					This file is part of GostxBoard						//
+// 					This file is part of GostCrypt						//
 //																		//
-//  GostxBoard is free software: you can redistribute it and/or modify	//
-//  it under the terms of the GNU General Public License as published	// 
-//	by the Free Software Foundation, either version 3 of the License, 	//
-//	or (at your option) any later version. 								//
+//  GostxCrypt is free software: you can redistribute it and/or modify	//
+//  it under the terms of the TrueCrypt Collective License.				//
 //                Such things are STRONGLY recommended.					//
 //    																	//
-// 	GostxBoard is distributed in the hope that it will be useful,		//
+// 	 GostCrypt is distributed in the hope that it will be useful,		//
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of		//	
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the		//
 //  GNU General Public License for more details.						//	
-//  Do not blame the developper if something goes wrong. You can 		//	
-//  either search on the Internet or email the developper to deal 		//
+//  Do not blame the developpers if something goes wrong. You can 		//	
+//  either search on the Internet or email the developpers to deal 		//
 //  with it.															//
 //																		//
-//  You should have received a copy of the GNU General Public License 	//
-//  along with GostxBoard.  If not, see <http://www.gnu.org/licenses/>. //
+//  You should have received a copy of the TrueCrypt Public License 	//
+//    along with GostCrypt.  If not, see <http://gostcrypt.org/>.		//
 //																		//
 //                              P.A 									//
-//                    driver_support@whitekernel.fr 					//
+//						support@gostcrypt.org 							//
 //**********************************************************************//
 
 /**
 * \~English
 * \file      functions.c
-* \author    Paul Amicelli
+* \author    GostCrypt Foundation - P.A
 * \version   1.0
 * \date      May 21, 2015
 * \brief     Defines some usefull functions
@@ -34,7 +32,7 @@
 *
 * \~French
 * \file		functions.c
-* \author	Paul Amicelli
+* \author	GostCrypt Foundation - P.A
 * \version  1.0
 * \date		21 Mai 2015
 * \brief	Définit des fonctions utilitaires
@@ -69,36 +67,37 @@ extern PAPP_CREDENTIALS	pCurrentApp;
 * \return   void
 *
 */
+/*
 VOID HashKey( char * cKey, 
 			 int keyLength, 
 			 unsigned char usResult[32]  )
 {
 	SHA256_CTX	ctx;
 	#ifdef _DEBUG
-		DbgPrint("[+] GostxBoard_HashKey::Entry \n");
+		DbgPrint("[+] KbdCrypt_HashKey::Entry \n");
 	#endif
 
 	#ifdef _DEBUG
-		DbgPrint("[+] GostxBoard_HashKey::Initiate \n");
+		DbgPrint("[+] KbdCrypt_HashKey::Initiate \n");
 	#endif
 	sha256_init(&ctx);
 	#ifdef _DEBUG
-		DbgPrint("[+] GostxBoard_HashKey::Update \n");
+		DbgPrint("[+] KbdCrypt_HashKey::Update \n");
 	#endif
 	sha256_update( &ctx, 
 		(unsigned char *) cKey,
 		keyLength );
 	#ifdef _DEBUG
-		DbgPrint("[+] GostxBoard_HashKey::End\n");
+		DbgPrint("[+] KbdCrypt_HashKey::End\n");
 	#endif
 	sha256_final( &ctx, usResult);
 
 	#ifdef _DEBUG
-		DbgPrint("[+] GostxBoard_HashKey::Hash Generated \n");
+		DbgPrint("[+] KbdCrypt_HashKey::Hash Generated \n");
 	#endif
 	
 }
-
+*/
 
 /**
 * \~English
@@ -133,7 +132,7 @@ VOID	ProcessNotifyRoutine (
 	if( create )
 	{
 		//
-		// Creation of the processus
+		// Creation of the process
 		//
 	} else {
 		//
@@ -147,11 +146,69 @@ VOID	ProcessNotifyRoutine (
 			//
 			ResetCipher();
 			#ifdef _DEBUG
-				DbgPrint("[+] GostxBoard_ProcessNotify::Client app with PID %d seems to be dead.\n", processId);
-				DbgPrint("[+] GostxBoard_ProcessNotify::Cleaning cipher session.\n");
+				DbgPrint("[+] KbdCrypt_ProcessNotify::Client app with PID %d seems to be dead.\n", processId);
+				DbgPrint("[+] KbdCrypt_ProcessNotify::Cleaning cipher session.\n");
 			#endif
 		}
 
 	}
 	return;
+}
+
+/**
+* \~English
+* \brief    Security Watcher
+* \details  This function is called each time the driver wants to know the security 
+*			contexte in which it is running. 
+*
+* \param	void
+* \return   DWORD	Return code defined in defines_common
+*
+* \~French
+* \brief    Monitoring des processus
+* \details  Cette fonction est appelée à chaque fois que le driver veut vérifier 
+*			le contexte de sécurité dans lequel il s'exécute. 
+*
+* \param	void
+* \return   DWORD	Code de retour définit dans defines_common
+*
+*/
+DWORD	CheckDriverSecurityContext(void)
+{
+	DWORD	dwReturn = RETURN_SUCCESS;
+	PDEVICE_OBJECT pRootDevice = NULL;
+	PDEVICE_OBJECT pNextDevice = NULL;
+	PDRIVER_OBJECT pCurrDriver = NULL;
+
+	DbgPrint("[+] CheckDriverSecurityContext:: Check has begun.. \n");
+
+	// 
+	// First, get the current pointer device object 
+	//
+	pRootDevice = 
+		WdfDeviceWdmGetPhysicalDevice(pCurrentApp->wdfCurrentDevice);
+	if (pRootDevice == NULL)
+	{
+		DbgPrint("[x] CheckDriverSecurityContext::Error :  Unable to get current device object ! \n");
+		return ERR_PDO_FROM_WDFDEVICE_FAILED;
+	}
+
+	pNextDevice = pRootDevice;
+
+	//
+	// Walk the keyboard stack to check if something's wrong.. 
+	//
+	while (pNextDevice != NULL)
+	{
+		// Get driver from device object 
+		pCurrDriver = pRootDevice->DriverObject;
+
+		// Check name of the driver
+		pCurrDriver->DriverName.Buffer
+
+		pNextDevice = IoGetLowerDeviceObject(pRootDevice);
+		pRootDevice = pNextDevice;
+	}
+
+	return dwReturn;
 }

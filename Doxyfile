@@ -1888,7 +1888,7 @@ XML_PROGRAMLISTING     = YES
 # that can be used to generate PDF.
 # The default value is: NO.
 
-GENERATE_DOCBOOK       = NO
+GENERATE_DOCBOOK       = YES
 
 # The DOCBOOK_OUTPUT tag is used to specify where the Docbook pages will be put.
 # If a relative path is entered the value of OUTPUT_DIRECTORY will be put in
@@ -1896,7 +1896,7 @@ GENERATE_DOCBOOK       = NO
 # The default directory is: docbook.
 # This tag requires that the tag GENERATE_DOCBOOK is set to YES.
 
-DOCBOOK_OUTPUT         = docbook
+DOCBOOK_OUTPUT         = O:\GostxBoard\docbook
 
 # If the DOCBOOK_PROGRAMLISTING tag is set to YES, doxygen will include the
 # program listings (including syntax highlighting and cross-referencing
@@ -1917,7 +1917,7 @@ DOCBOOK_PROGRAMLISTING = NO
 # still experimental and incomplete at the moment.
 # The default value is: NO.
 
-GENERATE_AUTOGEN_DEF   = NO
+GENERATE_AUTOGEN_DEF   = YES
 
 #---------------------------------------------------------------------------
 # Configuration options related to the Perl module output
@@ -2098,7 +2098,7 @@ PERL_PATH              = /usr/bin/perl
 # powerful graphs.
 # The default value is: YES.
 
-CLASS_DIAGRAMS         = NO
+CLASS_DIAGRAMS         = YES
 
 # You can define message sequence charts within doxygen comments using the \msc
 # command. Doxygen will then run the mscgen tool (see:
@@ -2301,7 +2301,7 @@ INTERACTIVE_SVG        = NO
 # found. If left blank, it is assumed the dot tool can be found in the path.
 # This tag requires that the tag HAVE_DOT is set to YES.
 
-DOT_PATH               = 
+DOT_PATH               = "C:\Program Files (x86)\Graphviz2.38\bin"
 
 # The DOTFILE_DIRS tag can be used to specify one or more directories that
 # contain dot files that are included in the documentation (see the \dotfile

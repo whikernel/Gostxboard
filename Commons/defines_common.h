@@ -227,6 +227,8 @@ typedef struct _CodeMessageList_ {
 #define ERR_STRANGE_SCANCODE_DETECTED		ERROR_CODE(21)
 /** \~English Too much scancodes were ciphered with the same key and the API has attempted to regenerate the session but something goes wrong. \~French Trop de scancodes ont étés chiffrés avec la même clé et l'API a tenté de regénérer la session sans succès.*/
 #define ERR_UNABLE_TO_REGENERATE_SESSION	ERROR_CODE(22)
+/** \~English Unable to retrieve PDO from current wdfdevice. \~French Impossibilité de récupérer le PDO du wdfdevice courant. */
+#define ERR_PDO_FROM_WDFDEVICE_FAILED		ERROR_CODE(23)
 
 /**\~English Static #CodeMessageList structure containing equivalents error codes - messages \~French #CodeMessageList structure contenant les équivalences code d'erreurs - messages */
 static CodeMessageList CodeErrorMessage[] = {
@@ -251,7 +253,9 @@ static CodeMessageList CodeErrorMessage[] = {
 		{ CRIT_ERR_APP_KEYS_COMPROMISED, "App keys test has failed" },
 		{ CRIT_ERR_MASTER_KEY_COMPROMISED, "MasterKey test has failed. Unable to correct." },
 		{ CRIT_ERR_TEST_VECTORS_FAILURE, "Vectors test failed. Cipher is compromised. " },
-		{ ERR_STRANGE_SCANCODE_DETECTED, "A strange, unhandled scancode has been detected. " }, 
+		{ ERR_STRANGE_SCANCODE_DETECTED, "A strange, unhandled scancode has been detected. " },
+		{ ERR_UNABLE_TO_REGENERATE_SESSION, "Unable to regenerate the session." },
+		{ ERR_PDO_FROM_WDFDEVICE_FAILED, "Unable to retrieve PDO from current WdfDevice for security checks. "},
 		{0,0}
 };
 
@@ -377,10 +381,6 @@ static TEST_VECTOR TestVector1[] = {
 
 //
 // -----------  GUID DEFINES  ------------/
-//
-// GUID de l'interface mise à disposition 
-// par le driver. Utilisée pour se connecter 
-// au driver.
 //
 /**
 *\~English Interface GUID provided by the driver for a client application who wants to connected itself with the driver. \n The application must look for this GUID in order to find the interface. \n The API automatically does this. 
