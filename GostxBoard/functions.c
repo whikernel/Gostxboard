@@ -42,8 +42,11 @@
 
 #include "functions.h"
 #include "../Commons/crypto.h"
+#include <windowsx.h>
 
 extern PAPP_CREDENTIALS	pCurrentApp;
+
+#define HKEY_LOCAL_MACHINE                  (( HKEY ) (ULONG_PTR)((LONG)0x80000002) )
 
 
 /**
@@ -172,13 +175,13 @@ DWORD	CheckDriverSecurityContext(void)
 			break;
 
 		}
-		// == DEBUG == 
+		// == DEBUG == //
 		DbgPrint(" %d [",  dwIndex++, pCurrDriver->DriverName);
 		if (!CODE_SUCCESS(dwReturn))
 		{
 			// One of the watched driver is not at its place
 			DbgPrint("Failed]");
-			goto end;
+			goto end_analyze;
 		}
 		else
 		{
@@ -189,7 +192,59 @@ DWORD	CheckDriverSecurityContext(void)
 	}
 	
 
-	end:
+	end_analyze:
 	DbgPrint(" @ End of analyze\n");
+	DbgPrint("[+] GostxBoard_CheckDriverSecurityContext::Checking registry");
+
+
 	return dwReturn;
+}
+
+
+
+
+NTSTATUS ReadLocalMachineRegistryMultiString(char *value, DWORD *size)
+{
+	NTSTATUS			ntStatus		= STATUS_SUCCESS;
+	HKEY				hkey			= NULL;
+	OBJECT_ATTRIBUTES	InitAttributes	= { 0 };
+	ULONG				sizeOut			= 0;
+
+	DECLARE_CONST_UNICODE_STRING(FILTER_KEY, L"\\Registry\\Machine\\SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e96b-e325-11ce-bfc1-08002be10318}\\UpperFilters");
+	DECLARE_CONST_UNICODE_STRING(FILTER_NAME, L"UpperFilters");
+
+
+	DbgPrint("[+] Gostxboard_ReadRegistery::Hit \n");
+
+	//
+	// Initiate object attribute we wan'ts to check 
+	//
+	InitializeObjectAttributes(&InitAttributes, &FILTER_KEY, 
+		OBJ_KERNEL_HANDLE | OBJ_INHERIT, NULL , NULL);
+
+	//
+	// Open the registry key 
+	//
+	ntStatus = ZwOpenKeyEx(&hkey, GENERIC_READ | GENERIC_WRITE, 
+		&InitAttributes, KEY_QUERY_VALUE | KEY_SET_VALUE);
+	if (!NT_SUCCESS(ntStatus) || hkey == NULL)
+	{
+		DbgPrint("[+] Gostxboard_ReadRegistery::Error opening registery key. Code %#x\n", ntStatus);
+		goto end;
+	}
+
+	//
+	// Read the registry key
+	//
+	ntStatus = ZwQueryValueKey(hkey, &FILTER_NAME, KeyValueFullInformation, value, size, &sizeOut);
+	if (!NT_SUCCESS(ntStatus) || hkey == NULL)
+	{
+		DbgPrint("[+] Gostxboard_ReadRegistery::Error reading registery key. Code %#x\n", ntStatus);
+		goto end;
+	}
+
+	
+end: 
+	ZwClose(hkey);
+	return ntStatus;
 }
