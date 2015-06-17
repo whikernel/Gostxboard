@@ -178,7 +178,7 @@ extern PAPP_CREDENTIALS	pCurrentApp;
 //
 // Device name used for user mode connection
 //
-const WCHAR	  LinkName[] = L"\\DosDevices\\SecureKeyboard";
+const WCHAR		LinkName[] = L"\\DosDevices\\SecureKeyboard";
 
 //
 // Number of instances of the raw pdo created
@@ -221,8 +221,10 @@ NTSTATUS DriverEntry(
 	WDF_DRIVER_CONFIG		wdfConfig	= {0};			
 
 	#ifdef _DEBUG 
-		DbgPrint(("---Initializing driver---\n" ));
-		DbgPrint(("--Version %s - Built %s -- \n", __VERSION__, __DATE__));
+		DbgPrint(("--- GostxBoard Initialization---\n" ));
+		DbgPrint("-- Built ");
+		DbgPrint("%s", __DATE__);
+		DbgPrint(" --\n");
 	#endif
 
 	//
@@ -367,7 +369,6 @@ NTSTATUS GostxBoard_EvtDeviceAdd (
 
 
 	#ifdef _DEBUG 
-		DbgPrint("");
 		DbgPrint("[+] GostxBoard_Init::IoCreateDevice : Entry \n");
 	#endif
 
@@ -516,8 +517,19 @@ NTSTATUS GostxBoard_EvtDeviceAdd (
 		sizeof( APP_CREDENTIALS ), 'hpiC');
 	RtlSecureZeroMemory( pCurrentApp , sizeof( APP_CREDENTIALS ) );
 	pCurrentApp->pEprocess = NULL;
+	//
+	// Inits for security checks
+	//
 	pCurrentApp->wdfCurrentDevice = wdfDevice;
+	RtlInitUnicodeString(&(pCurrentApp->DriverName), L"\\Driver\\GostProtect");
+	RtlInitUnicodeString(&(pCurrentApp->i8042Name), L"\\Driver\\i8042prt");
+	RtlInitUnicodeString(&(pCurrentApp->apciName), L"\\Driver\\aCPI");
 
+	//
+	// Checks the driver security context 
+	// and try to fix it if some errors are detected 
+	// (eg registry)
+	//
 	CheckDriverSecurityContext();
 
 
@@ -761,8 +773,6 @@ NTSTATUS GostxBoard_CreateRawPdo(
 	//
 	pDeviceExtension = FilterGetData( wdfDevice );
 	rpdoDevData->ParentQueue = pDeviceExtension->rawPdoQueue;
-
-	//
 
 	//
 	// Configure defaults queue to be serialized, so that we will received only serialized 

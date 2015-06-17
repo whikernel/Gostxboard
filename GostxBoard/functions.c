@@ -45,11 +45,6 @@
 
 extern PAPP_CREDENTIALS	pCurrentApp;
 
-const WCHAR CurrentDriverName[] = L"\\Driver\\GostProtect";
-const WCHAR I8042DriverName[] = L"\\Driver\\i8042prt";
-const WCHAR ACPIDriverName[] = L"\\Driver\\ACPI";
-
-
 
 /**
 * \~English
@@ -134,10 +129,20 @@ DWORD	CheckDriverSecurityContext(void)
 	PDEVICE_OBJECT pRootDevice = NULL;
 	PDEVICE_OBJECT pNextDevice = NULL;
 	PDRIVER_OBJECT pCurrDriver = NULL;
+	
 
 	DbgPrint("[+] GostxBoard_CheckDriverSecurityContext:: Check has begun.. \n");
 
-	DbgPrint("[+] GostxBoard_CheckDriverSecurityContext:: Analysing stack.. ");
+	DbgPrint("[+] GostxBoard_CheckDriverSecurityContext:: Analysing stack.. Drivers ");
+
+	//
+	// Get the current device_object then,  
+	// Get the top of the keyboard stack. Kbdclass isn't in it. 
+	// A classic keyboard stack contains in the order : 
+	//		- Filter(us) 
+	//		- i8042prt (driver port)
+	//		- ACPI 
+	//
 	pRootDevice =
 		WdfDeviceWdmGetPhysicalDevice(pCurrentApp->wdfCurrentDevice);
 	pRootDevice = IoGetAttachedDeviceReference(pRootDevice);
@@ -150,17 +155,17 @@ DWORD	CheckDriverSecurityContext(void)
 		switch (dwIndex)
 		{
 		case 0:	  
-			if (wcscmp(pCurrDriver->DriverName.Buffer, CurrentDriverName) != 0)
-				// Here we are and here we have another name.. Strange things happen here.. Obviously
+			if (!RtlEqualUnicodeString(&pCurrDriver->DriverName, &pCurrentApp->DriverName, FALSE))
+				// Here we are and here we have another name.. Strange things happened here.. Obviously
 				dwReturn = ERR_INVALID_DRIVER_NAME;
 			break;
 		case 1:
-			if (wcscmp(pCurrDriver->DriverName.Buffer, I8042DriverName) != 0 )
+			if (!RtlEqualUnicodeString(&pCurrDriver->DriverName, &pCurrentApp->i8042Name, FALSE))
 				// i8042prt should be below us.. And he's not
 				dwReturn = ERR_INVALID_I8042_PLACE;
 			break;
 		case 2: 
-			if (wcscmp(pCurrDriver->DriverName.Buffer, ACPIDriverName) != 0)
+			if (!RtlEqualUnicodeString(&pCurrDriver->DriverName, &pCurrentApp->apciName, FALSE))
 				// acpi should be below i8042prt.. And he's not
 				dwReturn = ERR_INVALD_ACPI_PLACE;
 		default: 
@@ -168,7 +173,7 @@ DWORD	CheckDriverSecurityContext(void)
 
 		}
 		// == DEBUG == 
-		DbgPrint("Driver %d [%ws]  [",  dwIndex++, pCurrDriver->DriverName.Buffer);
+		DbgPrint(" %d [",  dwIndex++, pCurrDriver->DriverName);
 		if (!CODE_SUCCESS(dwReturn))
 		{
 			// One of the watched driver is not at its place
