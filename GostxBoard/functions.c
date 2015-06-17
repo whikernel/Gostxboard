@@ -45,59 +45,11 @@
 
 extern PAPP_CREDENTIALS	pCurrentApp;
 
+const WCHAR CurrentDriverName[] = L"\\Driver\\GostProtect";
+const WCHAR I8042DriverName[] = L"\\Driver\\i8042prt";
+const WCHAR ACPIDriverName[] = L"\\Driver\\ACPI";
 
 
-/**
-* \~English
-* \brief    SHA256 Hash Function
-* \details  Compute the SHA256 hash of the cKey given. 
-*
-* \param	char * cKey Key to hash
-* \param	int keyLength	Size of the key to hash
-* \param    usigned char usResult[32]	Output hash
-* \return   void
-*
-* \~French
-* \brief    Fonction de hashage SHA256
-* \details  Calcule le hash de la clé cKey passé en paramètre.
-*
-* \param	char * cKey Clé à hasher
-* \param	int keyLength	Taille de la clé
-* \param    usigned char usResult[32]	Hash de la clé
-* \return   void
-*
-*/
-/*
-VOID HashKey( char * cKey, 
-			 int keyLength, 
-			 unsigned char usResult[32]  )
-{
-	SHA256_CTX	ctx;
-	#ifdef _DEBUG
-		DbgPrint("[+] KbdCrypt_HashKey::Entry \n");
-	#endif
-
-	#ifdef _DEBUG
-		DbgPrint("[+] KbdCrypt_HashKey::Initiate \n");
-	#endif
-	sha256_init(&ctx);
-	#ifdef _DEBUG
-		DbgPrint("[+] KbdCrypt_HashKey::Update \n");
-	#endif
-	sha256_update( &ctx, 
-		(unsigned char *) cKey,
-		keyLength );
-	#ifdef _DEBUG
-		DbgPrint("[+] KbdCrypt_HashKey::End\n");
-	#endif
-	sha256_final( &ctx, usResult);
-
-	#ifdef _DEBUG
-		DbgPrint("[+] KbdCrypt_HashKey::Hash Generated \n");
-	#endif
-	
-}
-*/
 
 /**
 * \~English
@@ -134,7 +86,9 @@ VOID	ProcessNotifyRoutine (
 		//
 		// Creation of the process
 		//
-	} else {
+	} 
+	else 
+	{
 		//
 		// Check if this is the application to monitor
 		//
@@ -165,7 +119,7 @@ VOID	ProcessNotifyRoutine (
 * \return   DWORD	Return code defined in defines_common
 *
 * \~French
-* \brief    Monitoring des processus
+* \brief    Monitoring de la sécurité
 * \details  Cette fonction est appelée à chaque fois que le driver veut vérifier 
 *			le contexte de sécurité dans lequel il s'exécute. 
 *
@@ -176,60 +130,61 @@ VOID	ProcessNotifyRoutine (
 DWORD	CheckDriverSecurityContext(void)
 {
 	DWORD	dwReturn = RETURN_SUCCESS;
+	DWORD	dwIndex = 0;
 	PDEVICE_OBJECT pRootDevice = NULL;
 	PDEVICE_OBJECT pNextDevice = NULL;
 	PDRIVER_OBJECT pCurrDriver = NULL;
 
-	PWCHAR 
+	DbgPrint("[+] GostxBoard_CheckDriverSecurityContext:: Check has begun.. \n");
 
-	DbgPrint("[+] CheckDriverSecurityContext:: Check has begun.. \n");
-
-	// 
-	// First, get the current pointer device object 
-	//
-	pRootDevice = 
+	DbgPrint("[+] GostxBoard_CheckDriverSecurityContext:: Analysing stack.. ");
+	pRootDevice =
 		WdfDeviceWdmGetPhysicalDevice(pCurrentApp->wdfCurrentDevice);
-	if (pRootDevice == NULL)
-	{
-		DbgPrint("[x] CheckDriverSecurityContext::Error :  Unable to get current device object ! \n");
-		return ERR_PDO_FROM_WDFDEVICE_FAILED;
-	}
-
+	pRootDevice = IoGetAttachedDeviceReference(pRootDevice);
 	pNextDevice = pRootDevice;
 
-	DbgPrint("==START OF CHAIN==\n");
-	//
-	// Walk the keyboard stack to check if something's wrong.. 
-	//
 	while (pNextDevice != NULL)
 	{
 		// Get driver from device object 
 		pCurrDriver = pRootDevice->DriverObject;
+		switch (dwIndex)
+		{
+		case 0:	  
+			if (wcscmp(pCurrDriver->DriverName.Buffer, CurrentDriverName) != 0)
+				// Here we are and here we have another name.. Strange things happen here.. Obviously
+				dwReturn = ERR_INVALID_DRIVER_NAME;
+			break;
+		case 1:
+			if (wcscmp(pCurrDriver->DriverName.Buffer, I8042DriverName) != 0 )
+				// i8042prt should be below us.. And he's not
+				dwReturn = ERR_INVALID_I8042_PLACE;
+			break;
+		case 2: 
+			if (wcscmp(pCurrDriver->DriverName.Buffer, ACPIDriverName) != 0)
+				// acpi should be below i8042prt.. And he's not
+				dwReturn = ERR_INVALD_ACPI_PLACE;
+		default: 
+			break;
 
-		// Check name of the driver
-		DbgPrint("\tName : %wZ \n",pCurrDriver->DriverName);
-
+		}
+		// == DEBUG == 
+		DbgPrint("Driver %d [%ws]  [",  dwIndex++, pCurrDriver->DriverName.Buffer);
+		if (!CODE_SUCCESS(dwReturn))
+		{
+			// One of the watched driver is not at its place
+			DbgPrint("Failed]");
+			goto end;
+		}
+		else
+		{
+			DbgPrint("Ok] - ");
+		}
 		pNextDevice = IoGetLowerDeviceObject(pRootDevice);
 		pRootDevice = pNextDevice;
 	}
+	
 
-	DbgPrint("==END OF CHAIN==\n");
-
-	DbgPrint("==Analyzing stack==\n");
-	pRootDevice = IoGetAttachedDeviceReference(pCurrentApp->wdfCurrentDevice);
-	pNextDevice = pRootDevice;
-	while (pNextDevice != NULL)
-	{
-		// Get driver from device object 
-		pCurrDriver = pRootDevice->DriverObject;
-
-		// Check name of the driver
-		DbgPrint("\tName : %wZ \n", pCurrDriver->DriverName);
-
-		pNextDevice = IoGetLowerDeviceObject(pRootDevice);
-		pRootDevice = pNextDevice;
-	}
-	DbgPrint("==End of analyze==");
-
+	end:
+	DbgPrint(" @ End of analyze\n");
 	return dwReturn;
 }

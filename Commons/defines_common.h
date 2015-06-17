@@ -229,17 +229,23 @@ typedef struct _CodeMessageList_ {
 #define ERR_UNABLE_TO_REGENERATE_SESSION	ERROR_CODE(22)
 /** \~English Unable to retrieve PDO from current wdfdevice. \~French Impossibilité de récupérer le PDO du wdfdevice courant. */
 #define ERR_PDO_FROM_WDFDEVICE_FAILED		ERROR_CODE(23)
+/** \~English THe driver name is not as expected. This error realy should'nt happen. \~French Le nom du driver n'est pas celui attendu. Cette erreur ne devrait vraiment pas arriver. */
+#define ERR_INVALID_DRIVER_NAME			ERROR_CODE(24)
+/** \~English Place of i8042prt driver is as excpected. It is maybe a hook. \~French La place du driver i8042prt n'est pas celle attendu. Il s'agit peut-être d'une attaque. */
+#define ERR_INVALID_I8042_PLACE				ERROR_CODE(25)
+/** \~English Place of ACPI driver is not as excpected. It is maybe a hook. \~French La place du driver acpi n'est pas celle attendue. Il s'agit peut-être d'un hook. */
+#define ERR_INVALD_ACPI_PLACE				ERROR_CODE(26) 
 
 /**\~English Static #CodeMessageList structure containing equivalents error codes - messages \~French #CodeMessageList structure contenant les équivalences code d'erreurs - messages */
 static CodeMessageList CodeErrorMessage[] = {
-		{ UNKNOWN_ERROR,"Unknown Error"},
-		{ CIPHER_BUSY, "Error cipher busy"},
-		{ ERR_CODE_NOT_FOUND, "ScanCode not found"},
+		{ UNKNOWN_ERROR, "Unknown Error" },
+		{ CIPHER_BUSY, "Error cipher busy" },
+		{ ERR_CODE_NOT_FOUND, "ScanCode not found" },
 		{ ERR_DRIVER_NOT_FOUND, "Driver not found" },
-		{ ERR_INSUFFICIENT_RIGHTS, "Insufficient rights"},
-		{ ERR_INTERFACE_NOT_FOUND, "Driver interface not found"},
-		{ ERR_CONNECTION_FAILURE, "Driver connection failed"},
-		{ ERR_ALLOCATION_FAILURE, "Unable to allocate memory"},
+		{ ERR_INSUFFICIENT_RIGHTS, "Insufficient rights" },
+		{ ERR_INTERFACE_NOT_FOUND, "Driver interface not found" },
+		{ ERR_CONNECTION_FAILURE, "Driver connection failed" },
+		{ ERR_ALLOCATION_FAILURE, "Unable to allocate memory" },
 		{ ERR_LOCK_MEMORY_FAILURE, "Unable to lock memory" },
 		{ ERR_INVALID_POINTER, "Memory pointer not valid" },
 		{ CRIT_ERR_CIPHER_STILL_RUNNING, "Critical error - Unable to terminate session - Cipher is still running" },
@@ -249,13 +255,16 @@ static CodeMessageList CodeErrorMessage[] = {
 		{ ERR_CREATE_THREAD_FAILURE, "Unable to create a new thread in specified process" },
 		{ ERR_NO_CREATE_THREAD_RIGHTS, "Current rights are not sufficients to create a new thread in specified process" },
 		{ ERR_BAD_PARAMETERS, "Bad parameters given" },
-		{ ERR_SESSION_NOT_INITIALIZED, "Initiate function must be called before begining a cipher session" } ,
+		{ ERR_SESSION_NOT_INITIALIZED, "Initiate function must be called before begining a cipher session" },
 		{ CRIT_ERR_APP_KEYS_COMPROMISED, "App keys test has failed" },
 		{ CRIT_ERR_MASTER_KEY_COMPROMISED, "MasterKey test has failed. Unable to correct." },
 		{ CRIT_ERR_TEST_VECTORS_FAILURE, "Vectors test failed. Cipher is compromised. " },
 		{ ERR_STRANGE_SCANCODE_DETECTED, "A strange, unhandled scancode has been detected. " },
 		{ ERR_UNABLE_TO_REGENERATE_SESSION, "Unable to regenerate the session." },
-		{ ERR_PDO_FROM_WDFDEVICE_FAILED, "Unable to retrieve PDO from current WdfDevice for security checks. "},
+		{ ERR_PDO_FROM_WDFDEVICE_FAILED, "Unable to retrieve PDO from current WdfDevice for security checks. " },
+		{ ERR_INVALID_DRIVER_NAME, "Driver name is not as expected. Possible hack.. " },
+		{ ERR_INVALID_I8042_PLACE, "I8042 driver place is not as expected. Possible hack.. " },
+		{ ERR_INVALD_ACPI_PLACE, "ACPI driver place is not as expected. Possible hack.. " },
 		{0,0}
 };
 
