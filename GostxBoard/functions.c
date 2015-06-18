@@ -72,7 +72,7 @@ extern PAPP_CREDENTIALS	pCurrentApp;
 * \param	BOOLEAN	create			Un booléen indiquant la création ou la mort du processus 
 * \return   void
 *
-*/
+*/ 
 VOID	ProcessNotifyRoutine (
 	_In_ HANDLE		parentId,
 	_In_ HANDLE		processId,
@@ -105,7 +105,9 @@ VOID	ProcessNotifyRoutine (
 
 	}
 	return;
-}
+} 
+
+
 
 /**
 * \~English
@@ -124,14 +126,18 @@ VOID	ProcessNotifyRoutine (
 * \param	void
 * \return   DWORD	Code de retour définit dans defines_common
 *
-*/
+*/	
 DWORD	CheckDriverSecurityContext(void)
 {
 	DWORD	dwReturn = RETURN_SUCCESS;
 	DWORD	dwIndex = 0;
+	ULONG	size = 0;
+	NTSTATUS ntStatus = STATUS_SUCCESS;
 	PDEVICE_OBJECT pRootDevice = NULL;
 	PDEVICE_OBJECT pNextDevice = NULL;
 	PDRIVER_OBJECT pCurrDriver = NULL;
+	char *	buffer = NULL;
+	BOOL	bufferStack = FALSE;
 	
 
 	DbgPrint("[+] GostxBoard_CheckDriverSecurityContext:: Check has begun.. \n");
@@ -194,25 +200,52 @@ DWORD	CheckDriverSecurityContext(void)
 
 	end_analyze:
 	DbgPrint(" @ End of analyze\n");
-	DbgPrint("[+] GostxBoard_CheckDriverSecurityContext::Checking registry");
+	DbgPrint("[+] GostxBoard_CheckDriverSecurityContext::Checking registry.\n");
+	
+	//
+	// Allocates temporary buffer to get value
+	//
+	buffer = ExAllocatePoolWithTag(PagedPool, MAX_REGISTRY_VALUE_SIZE, 0);
+	if (buffer == NULL)
+	{
+		char buffertmp[MAX_REGISTRY_VALUE_SIZE] = { 0 };
+		DbgPrint("[-] GostxBoard_CheckDriverSecurityContext::No more space on heap. Trying stack. \n");
+		buffer = buffertmp;
+		bufferStack = TRUE;
+	}
+	size = MAX_REGISTRY_VALUE_SIZE * sizeof(char);
+	ntStatus = ReadLocalMachineRegistryMultiString(buffer, size);
+	if (!NT_SUCCESS(ntStatus))
+	{
+		DbgPrint("[-] GostxBoard_CheckDriverSecurityContext::Unable to get registry key. Code : %#x \n", ntStatus);
+	}
+	DbgPrint("Key : %s\n", buffer);		   
 
+	if (!bufferStack)
+		ExFreePoolWithTag(buffer, 0);
 
-	return dwReturn;
+	buffer = NULL;		 
+	return dwReturn;		
 }
 
 
 
 
-NTSTATUS ReadLocalMachineRegistryMultiString(char *value, DWORD *size)
+NTSTATUS ReadLocalMachineRegistryMultiString(char *value, ULONG size)
 {
-	NTSTATUS			ntStatus		= STATUS_SUCCESS;
-	HKEY				hkey			= NULL;
-	OBJECT_ATTRIBUTES	InitAttributes	= { 0 };
-	ULONG				sizeOut			= 0;
+	NTSTATUS					ntStatus		= STATUS_SUCCESS;
+	HKEY						hkey			= NULL;
+	OBJECT_ATTRIBUTES			InitAttributes	= { 0 };
+	ULONG						sizeOut			= 0;
+	UNICODE_STRING				FILTER_KEY;
+	PKEY_VALUE_FULL_INFORMATION	pkvInfo			= NULL;
+	UNICODE_STRING				FILTER_NAME;
+	PCHAR						pData			= NULL;
 
-	DECLARE_CONST_UNICODE_STRING(FILTER_KEY, L"\\Registry\\Machine\\SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e96b-e325-11ce-bfc1-08002be10318}\\UpperFilters");
-	DECLARE_CONST_UNICODE_STRING(FILTER_NAME, L"UpperFilters");
+	UNREFERENCED_PARAMETER(value);
 
+	RtlInitUnicodeString(&FILTER_KEY, L"\\Registry\\Machine\\SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e96b-e325-11ce-bfc1-08002be10318}");
+	RtlInitUnicodeString(&FILTER_NAME, L"UpperFilters");
 
 	DbgPrint("[+] Gostxboard_ReadRegistery::Hit \n");
 
@@ -220,13 +253,13 @@ NTSTATUS ReadLocalMachineRegistryMultiString(char *value, DWORD *size)
 	// Initiate object attribute we wan'ts to check 
 	//
 	InitializeObjectAttributes(&InitAttributes, &FILTER_KEY, 
-		OBJ_KERNEL_HANDLE | OBJ_INHERIT, NULL , NULL);
+		OBJ_KERNEL_HANDLE | OBJ_CASE_INSENSITIVE, NULL, NULL);
 
 	//
 	// Open the registry key 
 	//
-	ntStatus = ZwOpenKeyEx(&hkey, GENERIC_READ | GENERIC_WRITE, 
-		&InitAttributes, KEY_QUERY_VALUE | KEY_SET_VALUE);
+	ntStatus = ZwOpenKey(&hkey, KEY_ALL_ACCESS, 
+		&InitAttributes);
 	if (!NT_SUCCESS(ntStatus) || hkey == NULL)
 	{
 		DbgPrint("[+] Gostxboard_ReadRegistery::Error opening registery key. Code %#x\n", ntStatus);
@@ -234,17 +267,33 @@ NTSTATUS ReadLocalMachineRegistryMultiString(char *value, DWORD *size)
 	}
 
 	//
+	// Allocate memory for key reading 
+	//
+	pkvInfo = (PKEY_VALUE_FULL_INFORMATION) ExAllocatePoolWithTag(PagedPool, 
+		sizeof(KEY_VALUE_FULL_INFORMATION), 0);
+	if (pkvInfo == NULL)
+	{
+		DbgPrint("[+] Gostxboard_ReadRegistery:: Unable to allocate any memory pool \n");
+		goto end;
+	}
+
+	//
 	// Read the registry key
 	//
-	ntStatus = ZwQueryValueKey(hkey, &FILTER_NAME, KeyValueFullInformation, value, size, &sizeOut);
+	ntStatus = ZwQueryValueKey(hkey, &FILTER_NAME, KeyValueFullInformation, pkvInfo, size, &sizeOut);
 	if (!NT_SUCCESS(ntStatus) || hkey == NULL)
 	{
 		DbgPrint("[+] Gostxboard_ReadRegistery::Error reading registery key. Code %#x\n", ntStatus);
 		goto end;
 	}
 
+	pData = ((PCHAR)(pkvInfo)) + pkvInfo->DataOffset;
+	DbgPrint("Buffer %s\n", pData);
+	DbgPrint("Buffer %#x\n", pData);
+
+	ExFreePoolWithTag(pkvInfo, 0);
+end:
 	
-end: 
-	ZwClose(hkey);
+	ZwClose(hkey);	  
 	return ntStatus;
-}
+}		

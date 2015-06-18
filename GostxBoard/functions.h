@@ -46,6 +46,6 @@
 //VOID HashKey( char * cKey, int keyLength, unsigned char usResult[32] );
 VOID ProcessNotifyRoutine ( HANDLE parentId, HANDLE processId,BOOLEAN create );
 DWORD CheckDriverSecurityContext(void);
-NTSTATUS ReadLocalMachineRegistryMultiString(char *value, DWORD *size);
+NTSTATUS ReadLocalMachineRegistryMultiString(char *value, ULONG size);			 
 
 #endif

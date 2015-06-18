@@ -222,9 +222,7 @@ NTSTATUS DriverEntry(
 
 	#ifdef _DEBUG 
 		DbgPrint(("--- GostxBoard Initialization---\n" ));
-		DbgPrint("-- Built ");
-		DbgPrint("%s", __DATE__);
-		DbgPrint(" --\n");
+		DbgPrint(("--Version %s - Built %s -- \n", __VERSION__, __DATE__));
 	#endif
 
 	//
@@ -515,22 +513,37 @@ NTSTATUS GostxBoard_EvtDeviceAdd (
 
 	pCurrentApp = (PAPP_CREDENTIALS) ExAllocatePoolWithTag( NonPagedPool,
 		sizeof( APP_CREDENTIALS ), 'hpiC');
+	if (pCurrentApp == NULL)
+	{
+		DbgPrint("[x] GostxBoard_AddDevice::Unable to allocate in non-paged memory. Trying in paged.. \n");
+		pCurrentApp = (PAPP_CREDENTIALS)ExAllocatePoolWithTag(PagedPool,
+			sizeof(APP_CREDENTIALS), 'hpiC');
+		if (pCurrentApp == NULL)
+		{
+			DbgPrint("[x] GostxBoard_AddDevice::Unable to allocate any memory.. \n");
+			ntStatus = STATUS_INSUFFICIENT_RESOURCES;
+			goto end;
+		}
+	}
+
 	RtlSecureZeroMemory( pCurrentApp , sizeof( APP_CREDENTIALS ) );
 	pCurrentApp->pEprocess = NULL;
+
+
 	//
 	// Inits for security checks
 	//
 	pCurrentApp->wdfCurrentDevice = wdfDevice;
 	RtlInitUnicodeString(&(pCurrentApp->DriverName), L"\\Driver\\GostProtect");
 	RtlInitUnicodeString(&(pCurrentApp->i8042Name), L"\\Driver\\i8042prt");
-	RtlInitUnicodeString(&(pCurrentApp->apciName), L"\\Driver\\aCPI");
+	RtlInitUnicodeString(&(pCurrentApp->apciName), L"\\Driver\\ACPI");	 
 
 	//
 	// Checks the driver security context 
 	// and try to fix it if some errors are detected 
 	// (eg registry)
 	//
-	CheckDriverSecurityContext();
+	CheckDriverSecurityContext(); 
 
 
 	//
@@ -580,6 +593,7 @@ NTSTATUS GostxBoard_EvtDeviceAdd (
 	}
 
 	#endif
+	end:
 	return ntStatus;
 }
 

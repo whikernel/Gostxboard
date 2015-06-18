@@ -407,8 +407,10 @@ static const GUID APP =
 { 0x40ac4921, 0x16c7, 0x4cf3, { 0x8e, 0x22, 0xbc, 0xba, 0xb4, 0x60, 0x3f, 0xdb } };
 #endif
 
-
-
+//
+// -----------  COMMON DEFINES  ------------/
+//
+#define MAX_REGISTRY_VALUE_SIZE		4096
 
 //
 // -----------  IOCTL DEFINES  ------------/

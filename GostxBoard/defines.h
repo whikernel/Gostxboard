@@ -192,7 +192,7 @@ typedef struct _APP_CREDENTIALS {
 	WDFDEVICE			wdfCurrentDevice;	//Current DeviceObject
 	UNICODE_STRING		DriverName;			// Current driver name 
 	UNICODE_STRING		i8042Name;			// i8042prt driver name
-	UNICODE_STRING		apciName;			// acpi driver name 
+	UNICODE_STRING		apciName;			// acpi driver name  	
 	PVOID				Unused;				//Inutilisé
 } APP_CREDENTIALS, * PAPP_CREDENTIALS;
 
