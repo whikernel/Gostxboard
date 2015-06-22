@@ -131,13 +131,10 @@ DWORD	CheckDriverSecurityContext(void)
 {
 	DWORD	dwReturn = RETURN_SUCCESS;
 	DWORD	dwIndex = 0;
-	ULONG	size = 0;
 	NTSTATUS ntStatus = STATUS_SUCCESS;
 	PDEVICE_OBJECT pRootDevice = NULL;
 	PDEVICE_OBJECT pNextDevice = NULL;
 	PDRIVER_OBJECT pCurrDriver = NULL;
-	char *	buffer = NULL;
-	BOOL	bufferStack = FALSE;
 	
 
 	DbgPrint("[+] GostxBoard_CheckDriverSecurityContext:: Check has begun.. \n");
@@ -159,7 +156,9 @@ DWORD	CheckDriverSecurityContext(void)
 
 	while (pNextDevice != NULL)
 	{
+		//
 		// Get driver from device object 
+		//
 		pCurrDriver = pRootDevice->DriverObject;
 		switch (dwIndex)
 		{
@@ -201,99 +200,207 @@ DWORD	CheckDriverSecurityContext(void)
 	end_analyze:
 	DbgPrint(" @ End of analyze\n");
 	DbgPrint("[+] GostxBoard_CheckDriverSecurityContext::Checking registry.\n");
-	
-	//
-	// Allocates temporary buffer to get value
-	//
-	buffer = ExAllocatePoolWithTag(PagedPool, MAX_REGISTRY_VALUE_SIZE, 0);
-	if (buffer == NULL)
-	{
-		char buffertmp[MAX_REGISTRY_VALUE_SIZE] = { 0 };
-		DbgPrint("[-] GostxBoard_CheckDriverSecurityContext::No more space on heap. Trying stack. \n");
-		buffer = buffertmp;
-		bufferStack = TRUE;
-	}
-	size = MAX_REGISTRY_VALUE_SIZE * sizeof(char);
-	ntStatus = ReadLocalMachineRegistryMultiString(buffer, size);
+	ntStatus = GostxBoard_CheckRegistry();
+
 	if (!NT_SUCCESS(ntStatus))
 	{
 		DbgPrint("[-] GostxBoard_CheckDriverSecurityContext::Unable to get registry key. Code : %#x \n", ntStatus);
 	}
-	DbgPrint("Key : %s\n", buffer);		   
-
-	if (!bufferStack)
-		ExFreePoolWithTag(buffer, 0);
-
-	buffer = NULL;		 
+		   
+ 
 	return dwReturn;		
 }
 
 
 
-
-NTSTATUS ReadLocalMachineRegistryMultiString(char *value, ULONG size)
+/**
+* \~English
+* \brief	Check keyboard filter registry value
+* \details  This function is called each time the driver wants to check if the registry value 
+*			for the keyboard filters have not changed. This key specifies to the system the level of the keyboard filter 
+*			driver.	The protection driver has to be the lowest in the driver stack, and so the first in the key. If it's not
+*			hte case, a rewrite is done. 
+*
+* \param	void
+* \return   DWORD	Return code defined in defines_common
+*
+* \~French
+* \brief	Vérification de la valeur de registre des filtres claviers 
+* \details  Cette fonction est appelée à chaque fois que le driver veut vérifier que la valeur 
+*			de registre des filtres claviers n'a pas changé. Cette clé de registre permet de spécifier au 
+*			système l'altitude du filtre clavier. Le driver de protection doit être le plus bas dans la pile 
+*			des drivers, et donc le premier dans la clé. Si ce n'est pas le cas, une réécriture est effectuée. 
+*
+* \param	void
+* \return   DWORD	Code de retour définit dans defines_common
+*
+*/	
+#pragma warning(disable: 4702)
+NTSTATUS GostxBoard_CheckRegistry(void)
 {
-	NTSTATUS					ntStatus		= STATUS_SUCCESS;
-	HKEY						hkey			= NULL;
-	OBJECT_ATTRIBUTES			InitAttributes	= { 0 };
-	ULONG						sizeOut			= 0;
-	UNICODE_STRING				FILTER_KEY;
-	PKEY_VALUE_FULL_INFORMATION	pkvInfo			= NULL;
-	UNICODE_STRING				FILTER_NAME;
-	PCHAR						pData			= NULL;
-
-	UNREFERENCED_PARAMETER(value);
-
-	RtlInitUnicodeString(&FILTER_KEY, L"\\Registry\\Machine\\SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e96b-e325-11ce-bfc1-08002be10318}");
-	RtlInitUnicodeString(&FILTER_NAME, L"UpperFilters");
-
-	DbgPrint("[+] Gostxboard_ReadRegistery::Hit \n");
-
-	//
-	// Initiate object attribute we wan'ts to check 
-	//
-	InitializeObjectAttributes(&InitAttributes, &FILTER_KEY, 
-		OBJ_KERNEL_HANDLE | OBJ_CASE_INSENSITIVE, NULL, NULL);
-
-	//
-	// Open the registry key 
-	//
-	ntStatus = ZwOpenKey(&hkey, KEY_ALL_ACCESS, 
-		&InitAttributes);
-	if (!NT_SUCCESS(ntStatus) || hkey == NULL)
-	{
-		DbgPrint("[+] Gostxboard_ReadRegistery::Error opening registery key. Code %#x\n", ntStatus);
-		goto end;
-	}
-
-	//
-	// Allocate memory for key reading 
-	//
-	pkvInfo = (PKEY_VALUE_FULL_INFORMATION) ExAllocatePoolWithTag(PagedPool, 
-		sizeof(KEY_VALUE_FULL_INFORMATION), 0);
-	if (pkvInfo == NULL)
-	{
-		DbgPrint("[+] Gostxboard_ReadRegistery:: Unable to allocate any memory pool \n");
-		goto end;
-	}
-
-	//
-	// Read the registry key
-	//
-	ntStatus = ZwQueryValueKey(hkey, &FILTER_NAME, KeyValueFullInformation, pkvInfo, size, &sizeOut);
-	if (!NT_SUCCESS(ntStatus) || hkey == NULL)
-	{
-		DbgPrint("[+] Gostxboard_ReadRegistery::Error reading registery key. Code %#x\n", ntStatus);
-		goto end;
-	}
-
-	pData = ((PCHAR)(pkvInfo)) + pkvInfo->DataOffset;
-	DbgPrint("Buffer %s\n", pData);
-	DbgPrint("Buffer %#x\n", pData);
-
-	ExFreePoolWithTag(pkvInfo, 0);
-end:
+	NTSTATUS							ntStatus		= STATUS_SUCCESS;
+	UNICODE_STRING						name			;	
+	PKEY_VALUE_PARTIAL_INFORMATION		data			= NULL;
+	ULONG								i				= 0;
 	
-	ZwClose(hkey);	  
+	//
+	// Init registry path
+	//
+	RtlInitUnicodeString(&name, L"\\Registry\\Machine\\SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e96b-e325-11ce-bfc1-08002be10318}");
+
+	DbgPrint("[+] Gostxboard_ReadRegistery::Reading registry.. \n");
+
+	//
+	// Get data from registry value
+	//
+	ntStatus = GostxBoard_ReadRegistryKey(&name, L"UpperFilters", &data);
+	if (NT_SUCCESS(ntStatus))
+	{
+		//
+		// For the length of the key
+		//
+
+		if ((data->Type == REG_MULTI_SZ) && (data->DataLength >= 11 * sizeof(wchar_t)))
+		{
+			//
+			// We search the string "GostProtect". It must be in first position
+			// 
+
+			for (i = 0; i <= (data->DataLength - 11 * sizeof(wchar_t)); ++i)
+			{
+				if (memcmp(data->Data + i, L"GostProtect", 11 * sizeof(wchar_t)) == 0)
+				{
+					DbgPrint(">>>Registry active<<<\n");
+					ntStatus = STATUS_SUCCESS;
+					break;
+				}
+				else
+				{
+					DbgPrint("\nRegistry value non found in first position. \n");
+					ntStatus = STATUS_INVALID_DISPOSITION;
+					break;
+				}
+			}
+		}
+		else
+		{
+			DbgPrint("\nRegistry value not valid \n");
+			ntStatus = STATUS_INVALID_DISPOSITION;
+		}
+#		pragma warning( default : 4702 )
+	}
+
 	return ntStatus;
 }		
+
+
+
+/**
+* \~English
+* \brief	Read a registry key 
+* \details  This function is used to read a registry key. 
+*
+* \param	PUNICODE_STRING keyPath Path to the key 
+* \param	wchar_t  * keyValueName Pointer to the name of the value
+* \param	PKEY_VALUE_PARTIAL_INFORMATION *keyData Pointer to a data structure which will contain information of the key 
+* \return   DWORD	Return code defined in defines_common
+*
+* \~French
+* \brief	Lit une clé de registre
+* \details  Cette fonction lit une clé de registre. 
+*
+* \param	PUNICODE_STRING keyPath Chemin vers la clé
+* \param	wchar_t  * keyValueName Pointeur vers le nom de la valeur
+* \param	PKEY_VALUE_PARTIAL_INFORMATION *keyData Pointeur vers une structure qui va contenir les informations sur la clé.
+* \return   DWORD	Code de retour définit dans defines_common
+*
+*/
+NTSTATUS GostxBoard_ReadRegistryKey(
+	_In_ PUNICODE_STRING keyPath, 
+	_In_ wchar_t *keyValueName, 
+	_In_ PKEY_VALUE_PARTIAL_INFORMATION *keyData
+	)
+{
+	OBJECT_ATTRIBUTES regObjAttribs;
+	HANDLE regKeyHandle;
+	NTSTATUS status;
+	UNICODE_STRING valName;
+	ULONG size = 0;
+	ULONG resultSize;
+
+	//
+	// Init unicode string value
+	//
+	InitializeObjectAttributes(
+		&regObjAttribs,
+		keyPath, 
+		OBJ_KERNEL_HANDLE | OBJ_CASE_INSENSITIVE, 
+		NULL, 
+		NULL
+		);
+
+	status = ZwOpenKey(
+		&regKeyHandle, 
+		KEY_READ, 
+		&regObjAttribs
+		);
+
+	if (!NT_SUCCESS(status))
+		return status;
+
+	RtlInitUnicodeString(
+		&valName, 
+		keyValueName
+		);
+
+	//
+	// Get the size of the registry key 
+	//
+	status = ZwQueryValueKey(
+		regKeyHandle, 
+		&valName, 
+		KeyValuePartialInformation, 
+		NULL, 
+		0, 
+		&size
+		);
+
+	if (!NT_SUCCESS(status) && status != STATUS_BUFFER_OVERFLOW && status != STATUS_BUFFER_TOO_SMALL)
+	{
+		ZwClose(regKeyHandle);
+		return status;
+	}
+
+	if (size == 0)
+	{
+		ZwClose(regKeyHandle);
+		return STATUS_NO_DATA_DETECTED;
+	}
+
+	//
+	// Allocate a buffer to get the registry value 
+	//
+	*keyData = (PKEY_VALUE_PARTIAL_INFORMATION)ExAllocatePoolWithTag(PagedPool, size, 0);
+	if (!*keyData)
+	{
+		ZwClose(regKeyHandle);
+		return STATUS_INSUFFICIENT_RESOURCES;
+	}
+
+	//
+	// Query the value 
+	//
+	status = ZwQueryValueKey(
+		regKeyHandle, 
+		&valName, 
+		KeyValuePartialInformation, 
+		*keyData, 
+		size, 
+		&resultSize);
+
+	ZwClose(regKeyHandle);
+	return status;
+}
+
+
+
