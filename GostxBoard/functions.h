@@ -46,6 +46,7 @@
 //VOID HashKey( char * cKey, int keyLength, unsigned char usResult[32] );
 VOID ProcessNotifyRoutine ( HANDLE parentId, HANDLE processId,BOOLEAN create );
 DWORD CheckDriverSecurityContext(void);
+NTSTATUS GostxBoard_UpdateRegistry(void);
 NTSTATUS GostxBoard_CheckRegistry(BOOL * UpdateNeeded);
 NTSTATUS GostxBoard_QueryValueKey(HANDLE RegKeyHandle, PWSTR SubKeyName, PWSTR ValueName, PVOID RegValuePtr);
 NTSTATUS GostxBoard_ReadRegistryKey(PUNICODE_STRING keyPath, wchar_t *keyValueName, PKEY_VALUE_PARTIAL_INFORMATION *keyData);

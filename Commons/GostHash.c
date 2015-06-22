@@ -23,11 +23,14 @@
 //**********************************************************************//
 
 
+
+
 /*
  * This is an implementation of the GOST R 34.11-94 Hash Function Algorithm.
  */
 
 #include "GostHash.h"
+
 
 static byte C_3[32] =
 {
@@ -229,6 +232,8 @@ static void step (byte *H, byte *M, gost_hash_ctx *ctx)
 {
 	byte U[32], W[32], V[32], S[32], K[4][32];
 	gst_dword i;
+
+	if (ctx);
 	
 	xor_blocks(W, H, M, 32);
 	P_transform(W, K[0]); //First key

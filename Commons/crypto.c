@@ -48,7 +48,9 @@
 *			compilation.
 */
 
-#include "../Commons/crypto.h"
+
+#include "../Commons/crypto.h"	
+#include "../Commons/GostHash.h"
 #include "../Commons/defineKbFr.h"
 #include "../Commons/defines_common.h"
 #include <intrin.h>
@@ -491,6 +493,7 @@ unsigned long long GenerateKey()
 	unsigned int		random		= 0;
 	unsigned int		index		= 0;
 	unsigned long long	seed		= 0;
+	gost_hash_ctx		ctx			= { 0 };
 
 	#ifdef _DEBUG
 		DbgPrint("[+] GostxBoard_GenerateKey::Entry\n");
@@ -527,12 +530,22 @@ unsigned long long GenerateKey()
 		//
 		// Generate the stream
 		//
-		KeyOut = StreamCipher( init, 1);
+		seed = StreamCipher( init, 1);
 	}
 	//
-	// Reset the stream to later call
+	// Reset the stream for later call
 	//
 	StreamCipher( 0, 0 );
+
+	DbgPrint("[+] GostxBoard_GenerateKey::Hashing generated key..\n");
+
+	//
+	//	Hash the key to avoid biais 
+	//
+	GOSTHASH_init(&ctx);
+	GOSTHASH_add((byte *)&seed, sizeof(seed), &ctx);
+	GOSTHASH_finalize(&ctx, (byte *)&KeyOut);
+
 
 	#ifdef _DEBUG
 		DbgPrint("[+] GostxBoard_GenerateKey::Done\n");

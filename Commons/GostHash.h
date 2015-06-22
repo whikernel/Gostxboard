@@ -33,17 +33,11 @@
 #define GOSTHASH_GOST_KEYSIZE		32
 
 typedef unsigned char byte;
-#ifdef GST_WINDOWS_BOOT
-typedef int gst_word;
-typedef long gst_dword;
-typedef unsigned int gst_uword;
-typedef unsigned long gst_udword;
-#else
+
 typedef short gst_word;
 typedef int gst_dword;
 typedef unsigned short gst_uword;
 typedef unsigned int gst_udword;
-#endif
 
 
 typedef struct gosthash_s_box

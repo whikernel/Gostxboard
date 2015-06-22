@@ -335,7 +335,7 @@ NTSTATUS GostxBoard_UpdateRegistry(void)
 	//GostxBoard_WriteRegistryKey(&name, L"UpperFilters", REG_MULTI_SZ, &data,  )
 
 	DbgPrint("[+] GostxBoard_UpdateRegistry::Updated..\n");
-
+	return STATUS_SUCCESS;
 }
 
 
