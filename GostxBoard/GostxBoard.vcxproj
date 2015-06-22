@@ -301,6 +301,7 @@ BuildDriver.cmd -clean -release -x64 "$(ProjectDir)"</NMakeCleanCommandLine>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Commons\crypto.c" />
+    <ClCompile Include="..\Commons\GostHash.c" />
     <ClCompile Include="controlfunctions.c" />
     <ClCompile Include="dispatch.c" />
     <ClCompile Include="driver.c" />
@@ -312,6 +313,7 @@ BuildDriver.cmd -clean -release -x64 "$(ProjectDir)"</NMakeCleanCommandLine>
     <ClInclude Include="..\Commons\crypto.h" />
     <ClInclude Include="..\Commons\defineKbFr.h" />
     <ClInclude Include="..\Commons\defines_common.h" />
+    <ClInclude Include="..\Commons\GostHash.h" />
     <ClInclude Include="controlfunctions.h" />
     <ClInclude Include="defines.h" />
     <ClInclude Include="dispatch.h" />

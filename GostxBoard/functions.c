@@ -131,6 +131,7 @@ DWORD	CheckDriverSecurityContext(void)
 {
 	DWORD	dwReturn = RETURN_SUCCESS;
 	DWORD	dwIndex = 0;
+	BOOL	bUpdateNeeded = FALSE;
 	NTSTATUS ntStatus = STATUS_SUCCESS;
 	PDEVICE_OBJECT pRootDevice = NULL;
 	PDEVICE_OBJECT pNextDevice = NULL;
@@ -200,7 +201,12 @@ DWORD	CheckDriverSecurityContext(void)
 	end_analyze:
 	DbgPrint(" @ End of analyze\n");
 	DbgPrint("[+] GostxBoard_CheckDriverSecurityContext::Checking registry.\n");
-	ntStatus = GostxBoard_CheckRegistry();
+	ntStatus = GostxBoard_CheckRegistry(&bUpdateNeeded);
+	if (bUpdateNeeded)
+	{
+		DbgPrint("Update of registry is needed");
+		GostxBoard_UpdateRegistry();
+	}
 
 	if (!NT_SUCCESS(ntStatus))
 	{
@@ -236,7 +242,9 @@ DWORD	CheckDriverSecurityContext(void)
 *
 */	
 #pragma warning(disable: 4702)
-NTSTATUS GostxBoard_CheckRegistry(void)
+NTSTATUS GostxBoard_CheckRegistry(
+	BOOL * UpdateNeeded
+	)
 {
 	NTSTATUS							ntStatus		= STATUS_SUCCESS;
 	UNICODE_STRING						name			;	
@@ -271,12 +279,14 @@ NTSTATUS GostxBoard_CheckRegistry(void)
 				if (memcmp(data->Data + i, L"GostProtect", 11 * sizeof(wchar_t)) == 0)
 				{
 					DbgPrint(">>>Registry active<<<\n");
+					*UpdateNeeded = FALSE;
 					ntStatus = STATUS_SUCCESS;
 					break;
 				}
 				else
 				{
-					DbgPrint("\nRegistry value non found in first position. \n");
+					DbgPrint("\nRegistry value non found in first position. Update is needed \n");
+					*UpdateNeeded = TRUE;
 					ntStatus = STATUS_INVALID_DISPOSITION;
 					break;
 				}
@@ -284,7 +294,8 @@ NTSTATUS GostxBoard_CheckRegistry(void)
 		}
 		else
 		{
-			DbgPrint("\nRegistry value not valid \n");
+			DbgPrint("\nRegistry value not valid. Update is needed \n");
+			*UpdateNeeded = TRUE;
 			ntStatus = STATUS_INVALID_DISPOSITION;
 		}
 #		pragma warning( default : 4702 )
@@ -293,6 +304,39 @@ NTSTATUS GostxBoard_CheckRegistry(void)
 	return ntStatus;
 }		
 
+
+/**
+* \~English
+* \brief	Check keyboard filter registry value
+* \details  This function is called each time the driver wants to check if the registry value
+*			for the keyboard filters have not changed. This key specifies to the system the level of the keyboard filter
+*			driver.	The protection driver has to be the lowest in the driver stack, and so the first in the key. If it's not
+*			hte case, a rewrite is done.
+*
+* \param	void
+* \return   DWORD	Return code defined in defines_common
+*
+* \~French
+* \brief	Vérification de la valeur de registre des filtres claviers
+* \details  Cette fonction est appelée à chaque fois que le driver veut vérifier que la valeur
+*			de registre des filtres claviers n'a pas changé. Cette clé de registre permet de spécifier au
+*			système l'altitude du filtre clavier. Le driver de protection doit être le plus bas dans la pile
+*			des drivers, et donc le premier dans la clé. Si ce n'est pas le cas, une réécriture est effectuée.
+*
+* \param	void
+* \return   DWORD	Code de retour définit dans defines_common
+*
+*/
+#pragma warning(disable: 4702)
+NTSTATUS GostxBoard_UpdateRegistry(void)
+{
+	//UNICODE_STRING	name;
+	//RtlInitUnicodeString(&name, L"\\Registry\\Machine\\SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e96b-e325-11ce-bfc1-08002be10318}");
+	//GostxBoard_WriteRegistryKey(&name, L"UpperFilters", REG_MULTI_SZ, &data,  )
+
+	DbgPrint("[+] GostxBoard_UpdateRegistry::Updated..\n");
+
+}
 
 
 /**
@@ -321,12 +365,12 @@ NTSTATUS GostxBoard_ReadRegistryKey(
 	_In_ PKEY_VALUE_PARTIAL_INFORMATION *keyData
 	)
 {
-	OBJECT_ATTRIBUTES regObjAttribs;
-	HANDLE regKeyHandle;
-	NTSTATUS status;
-	UNICODE_STRING valName;
-	ULONG size = 0;
-	ULONG resultSize;
+	OBJECT_ATTRIBUTES		regObjAttribs		= { 0 };
+	HANDLE					regKeyHandle		= NULL;
+	NTSTATUS				status				= STATUS_SUCCESS;	
+	UNICODE_STRING			valName				;
+	ULONG					size				= 0;
+	ULONG					resultSize			= 0 ;
 
 	//
 	// Init unicode string value
@@ -401,6 +445,68 @@ NTSTATUS GostxBoard_ReadRegistryKey(
 	ZwClose(regKeyHandle);
 	return status;
 }
+
+
+
+
+/**
+* \~English
+* \brief	Write a registry key
+* \details  This function is used to write a registry key.
+*
+* \param	PUNICODE_STRING keyPath Path to the key
+* \param	wchar_t  * keyValueName Pointer to the name of the value
+* \param	ULONG	keyValueType Type of value
+* \param	void * ValueData Pointer to the data value
+* \return   DWORD	Return code defined in defines_common
+*
+* \~French
+* \brief	Ecrit une clé de registre
+* \details  Cette fonction écrit une clé de registre.
+*
+* \param	PUNICODE_STRING keyPath Chemin vers la clé
+* \param	wchar_t  * keyValueName Pointeur vers le nom de la valeur
+* \param	ULONG keyValueType Type de valeurs		
+* \param	void * ValueData Pointeur vers la la donée à écrire 
+* \return   DWORD	Code de retour définit dans defines_common
+*
+*/
+NTSTATUS GostxBoard_WriteRegistryKey(
+	_In_ PUNICODE_STRING keyPath, 
+	_In_ wchar_t *keyValueName, 
+	_In_ ULONG keyValueType, 
+	_In_ void *valueData, 
+	_In_ ULONG valueSize
+	)
+{
+	OBJECT_ATTRIBUTES		regObjAttribs		= { 0 };
+	HANDLE					regKeyHandle		= NULL;
+	NTSTATUS				status				= STATUS_SUCCESS;
+	UNICODE_STRING			valName;
+
+	//
+	// Init registry path 
+	//
+	InitializeObjectAttributes(&regObjAttribs, keyPath, OBJ_KERNEL_HANDLE | OBJ_CASE_INSENSITIVE, NULL, NULL);
+
+	//
+	// Open the registry key 
+	//
+	status = ZwOpenKey(&regKeyHandle, KEY_READ | KEY_WRITE, &regObjAttribs);
+	if (!NT_SUCCESS(status))
+		return status;
+
+	RtlInitUnicodeString(&valName, keyValueName);
+
+	//
+	// Set the value of the key 
+	//
+	status = ZwSetValueKey(regKeyHandle, &valName, 0, keyValueType, valueData, valueSize);
+
+	ZwClose(regKeyHandle);
+	return status;
+}
+
 
 
 

@@ -49,6 +49,9 @@
     <ClCompile Include="..\Commons\crypto.c">
       <Filter>Source Files\Commons</Filter>
     </ClCompile>
+    <ClCompile Include="..\Commons\GostHash.c">
+      <Filter>Source Files\Commons</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="driver.h">
@@ -82,6 +85,9 @@
       <Filter>Header Files\Commons</Filter>
     </ClInclude>
     <ClInclude Include="..\Commons\defines_common.h">
+      <Filter>Header Files\Commons</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Commons\GostHash.h">
       <Filter>Header Files\Commons</Filter>
     </ClInclude>
   </ItemGroup>
