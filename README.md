@@ -13,7 +13,7 @@ Basically, one just has to download the source code and compile it with Microsof
 
 ### Contribution guidelines ###
 
-Any support or contribution is welcome. You can contact developpers by [mail](mailto: gostxboard_support@whitekernel.fr).
+Any support or contribution is welcome. You can contact developpers by [email](mailto: gostxboard_support@whitekernel.fr).
 
 ## Disclaimer 
  This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version. 
