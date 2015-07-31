@@ -1,23 +1,26 @@
 //**********************************************************************//
-// 					This file is part of GostCrypt						//
+// 					This file is part of GostxBoard						//
 //																		//
-//  GostxCrypt is free software: you can redistribute it and/or modify	//
-//  it under the terms of the TrueCrypt Collective License.				//
+//  GostxBoard is free software: you can redistribute it and/or modify	//
+//       it under the terms of the Creative Commons [Attribution-		//	
+//	NonCommercial-ShareAlike 4.0 International] License as published	// 
+//				 by the Ditribution of Creative Commons 				//		
 //                Such things are STRONGLY recommended.					//
 //    																	//
-// 	 GostCrypt is distributed in the hope that it will be useful,		//
+// 	GostxBoard is distributed in the hope that it will be useful,		//
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of		//	
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the		//
-//  GNU General Public License for more details.						//	
-//  Do not blame the developpers if something goes wrong. You can 		//	
-//  either search on the Internet or email the developpers to deal 		//
-//  with it.															//
+//  	Creative Commons [BY-NC-SA] License for more details.			//	
+//  Do not blame the developper if something goes wrong. You can 		//	
+//  either search on the Internet or email the developper to deal 		//
+//                             with it.									//
 //																		//
-//  You should have received a copy of the TrueCrypt Public License 	//
-//    along with GostCrypt.  If not, see <http://gostcrypt.org/>.		//
+//  You should have received a copy of the Creative Commons [BY-NC-SA]	// 
+//	             License along with GostxBoard. If not, see 			//
+//	  <https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode>. 	//
 //																		//
 //                              P.A 									//
-//						support@gostcrypt.org 							//
+//                gostxboard_support@whitekernel.fr 					//
 //**********************************************************************//
 
 /**
