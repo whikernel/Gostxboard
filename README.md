@@ -1,6 +1,6 @@
 # GostxBoard v1.0 #
 
-GostxBoard is a beta module created to improve Windows's security, by protecting the system from almost all keyloggers. The module consists of a kernel mode driver and an API which can be used by developpers to improve the security of their applications. 
+GostxBoard is a beta module developed to improve Windows's security, by protecting the system from a wide range of keyloggers. The module consists of a kernel mode driver and an API which can be used by developpers to improve the security of their applications. 
 
 
 ### What is this repository for ? ###
