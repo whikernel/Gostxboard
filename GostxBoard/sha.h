@@ -22,7 +22,7 @@
 //                              P.A 									//
 //                gostxboard_support@whitekernel.fr 					//
 //**********************************************************************//
-* \~English
+/* \~English
 * \file      sha.h
 * \author    Paul Amicelli
 * \version   1.0

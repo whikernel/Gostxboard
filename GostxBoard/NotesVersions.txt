@@ -76,10 +76,10 @@
 		amenée à être changée tous les 50 caractères environ. 
 
 #------------#
-# Version 2.0     
+# Version 1.2     
 #------------#
 	- Le driver doit être descendu pour des raisons de sécurités. 
 		En effet l'API de Windows permet de Hooker les entrées clavier 
-		à un niveau inférieur du driver <GostxBoard V2>
+		à un niveau inférieur du driver <GostxBoard v1>
 
 
