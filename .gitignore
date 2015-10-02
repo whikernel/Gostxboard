@@ -4,6 +4,7 @@
 *.aps
 *.pch
 *.vspscc
+*.sdf
 *_i.c
 *_p.c
 *.ncb
