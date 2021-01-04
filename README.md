@@ -1,6 +1,9 @@
+
+# THIS SOFTWARE IS OUT-DATED AND UNMAINTAINED
+
 # GostxBoard v1.2 #
 
-GostxBoard is a beta module developed to improve Windows's security, by protecting the system from a wide range of keyloggers. The module consists of a kernel mode driver and an API which can be used by developpers to improve the security of their applications. 
+GostxBoard is a test module developed to improve Windows's security, by protecting the system from some keyloggers. The module consists of a kernel mode driver and an API which can be used by developpers to improve the security of their applications. 
 
 
 ### What is this repository for ? ###
@@ -13,7 +16,7 @@ Basically, one just has to download the source code and compile it with Microsof
 
 ### Contribution guidelines ###
 
-Any support or contribution is welcome. You can contact developpers by [email](mailto: gostxboard_support@whitekernel.fr).
+Any support or contribution is welcome.
 
 ## Disclaimer 
 This program is free software, you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the licence, or any later version. See <http://www.gnu.org/licenses/gpl-3.0.fr.html>.		
